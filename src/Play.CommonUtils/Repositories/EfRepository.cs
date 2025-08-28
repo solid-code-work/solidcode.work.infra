@@ -4,7 +4,7 @@ using Play.CommonUtils.Entities;
 
 namespace Play.CommonUtils.Repositories;
 
-public class EfRepository<T> : IRepository<T> where T : class, IEntity
+public class EfRepository<T> : IRepository<T> where T : class, IEntity, new()
 {
     private readonly DbContext _context;
     private readonly DbSet<T> _dbSet;
@@ -15,83 +15,132 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         _dbSet = context.Set<T>();
     }
 
-    public async Task<List<T>> GetAllAsync()
+    // ---- QUERIES: Data is set ----
+    public async Task<TResult<List<T>>> GetAllAsync()
     {
-        return await _dbSet.ToListAsync();
-    }
-
-    public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> filter)
-    {
-        return await _dbSet.Where(filter).ToListAsync();
-    }
-
-    public async Task<T?> GetAsync(Guid id)
-    {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Id cannot be empty", nameof(id));
-
-        return await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
-    }
-
-    public async Task<T?> GetAsync(Expression<Func<T, bool>> filter)
-    {
-        return await _dbSet.FirstOrDefaultAsync(filter);
-    }
-    public async Task ApplyChangesAsync(T entity)
-    {
-        if (entity is null)
-            throw new ArgumentNullException(nameof(entity));
-
-        if (entity is not IListEditEntities editable)
-            throw new InvalidOperationException($"Entity of type {typeof(T).Name} must implement IListEditEntity to use SaveAsync.");
-
-        if (editable.IsNew)
+        var result = new TResult<List<T>>();
+        try
         {
-            await _dbSet.AddAsync(entity);
+            result.Data = await _dbSet.ToListAsync();
         }
-        else
+        catch (Exception ex)
         {
-            var existing = await GetAsync(entity.Id);
-            if (existing is null)
-                throw new InvalidOperationException($"Entity with Id {entity.Id} not found.");
-
-            _context.Entry(existing).CurrentValues.SetValues(entity);
+            result.Success = false;
+            result.Message = ex.Message;
         }
-
-        await _context.SaveChangesAsync();
-    }
-    public async Task CreateAsync(T entity)
-    {
-        if (entity is null)
-            throw new ArgumentNullException(nameof(entity));
-
-        await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
+        return result;
     }
 
-    public async Task UpdateAsync(T entity)
+    public async Task<TResult<List<T>>> GetAllAsync(Expression<Func<T, bool>> filter)
     {
-        if (entity is null)
-            throw new ArgumentNullException(nameof(entity));
-
-        var existing = await GetAsync(entity.Id);
-        if (existing is null)
-            throw new InvalidOperationException($"Entity with Id {entity.Id} not found.");
-
-        _context.Entry(existing).CurrentValues.SetValues(entity);
-        await _context.SaveChangesAsync();
+        var result = new TResult<List<T>>();
+        try
+        {
+            result.Data = await _dbSet.Where(filter).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task<TResult<T>> GetAsync(Guid id)
     {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Id cannot be empty", nameof(id));
+        var result = new TResult<T>();
+        try
+        {
+            if (id == Guid.Empty) throw new ArgumentException("Id cannot be empty", nameof(id));
 
-        var entity = await GetAsync(id);
-        if (entity is null)
-            throw new InvalidOperationException($"Entity with Id {id} not found.");
+            var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            if (entity != null)
+                result.Data = entity;
+            else
+                result.Success = false;
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
+    }
 
-        _dbSet.Remove(entity);
-        await _context.SaveChangesAsync();
+    public async Task<TResult<T>> GetAsync(Expression<Func<T, bool>> filter)
+    {
+        var result = new TResult<T>();
+        try
+        {
+            var entity = await _dbSet.FirstOrDefaultAsync(filter);
+            if (entity != null)
+                result.Data = entity;
+            else
+                result.Success = false;
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
+    }
+
+    // ---- COMMANDS: Data left unset ----
+    public async Task<TResult<T>> ApplyChangesAsync(T entity)
+    {
+        var result = new TResult<T>();
+        try
+        {
+            if (entity is null) throw new ArgumentNullException(nameof(entity));
+
+            if (entity is not IListEditEntities editable)
+                throw new InvalidOperationException(
+                    $"Entity of type {typeof(T).Name} must implement IListEditEntity to use ApplyChangesAsync."
+                );
+
+            if (editable.IsNew)
+            {
+                await _dbSet.AddAsync(entity);
+            }
+            else
+            {
+                var existing = await _dbSet.FirstOrDefaultAsync(x => x.Id == entity.Id);
+                if (existing is null)
+                    throw new InvalidOperationException($"Entity with Id {entity.Id} not found.");
+
+                _context.Entry(existing).CurrentValues.SetValues(entity);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
+    }
+
+    public async Task<TResult<T>> DeleteAsync(Guid id)
+    {
+        var result = new TResult<T>();
+        try
+        {
+            if (id == Guid.Empty) throw new ArgumentException("Id cannot be empty", nameof(id));
+
+            var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            if (entity is null)
+                throw new InvalidOperationException($"Entity with Id {id} not found.");
+
+            _dbSet.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
     }
 }

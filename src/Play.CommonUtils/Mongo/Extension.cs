@@ -37,7 +37,7 @@ public static class Extensions
         return services;
     }
 
-    public static IServiceCollection AddMongoRepository<T>(this IServiceCollection services, string collectionName) where T : IEntity
+    public static IServiceCollection AddMongoRepository<T>(this IServiceCollection services, string collectionName) where T : class, IEntity, new()
     {
         services.AddScoped<IRepository<T>>(x =>
         {

@@ -4,95 +4,151 @@ using Play.CommonUtils.Entities;
 
 namespace Play.CommonUtils.Repositories;
 
-public class MongoRepository<T> : IRepository<T> where T : IEntity
+public class MongoRepository<T> : IRepository<T> where T : class, IEntity, new()
 {
     private readonly IMongoCollection<T> _mongoCollection;
+    private readonly IMongoDatabase _database;
     private readonly FilterDefinitionBuilder<T> _filterBuilder = Builders<T>.Filter;
 
     public MongoRepository(IMongoDatabase database, string collectionName)
     {
+        _database = database;
         _mongoCollection = database.GetCollection<T>(collectionName);
     }
 
-    public async Task<List<T>> GetAllAsync()
+    // ---- QUERIES: Set Data ----
+    public async Task<TResult<List<T>>> GetAllAsync()
     {
-        return await _mongoCollection.Find(_filterBuilder.Empty).ToListAsync();
-    }
-
-    public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> filter)
-    {
-        return await _mongoCollection.Find(filter).ToListAsync();
-    }
-
-    public async Task<T?> GetAsync(Guid id)
-    {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Id cannot be empty", nameof(id));
-
-        var filter = _filterBuilder.Eq(x => x.Id, id);
-        return await _mongoCollection.Find(filter).FirstOrDefaultAsync();
-    }
-
-    public async Task<T?> GetAsync(Expression<Func<T, bool>> filter)
-    {
-        return await _mongoCollection.Find(filter).FirstOrDefaultAsync();
-    }
-
-    public async Task ApplyChangesAsync(T entity)
-    {
-        if (entity is null)
-            throw new ArgumentNullException(nameof(entity));
-
-        if (entity is not IListEditEntities editable)
-            throw new InvalidOperationException($"Entity of type {typeof(T).Name} must implement IListEditEntity to use SaveAsync.");
-
-        if (editable.IsNew)
+        var result = new TResult<List<T>>();
+        try
         {
-            await _mongoCollection.InsertOneAsync(entity);
+            result.Data = await _mongoCollection.Find(_filterBuilder.Empty).ToListAsync();
         }
-        else
+        catch (Exception ex)
         {
-            var filter = _filterBuilder.Eq(x => x.Id, entity.Id);
-            var result = await _mongoCollection.ReplaceOneAsync(filter, entity);
-
-            if (result.MatchedCount == 0)
-                throw new InvalidOperationException($"Entity with Id {entity.Id} not found for update.");
+            result.Success = false;
+            result.Message = ex.Message;
         }
+        return result;
     }
 
-
-    public async Task CreateAsync(T entity)
+    public async Task<TResult<List<T>>> GetAllAsync(Expression<Func<T, bool>> filter)
     {
-        if (entity is null)
-            throw new ArgumentNullException(nameof(entity));
-
-        await _mongoCollection.InsertOneAsync(entity);
+        var result = new TResult<List<T>>();
+        try
+        {
+            result.Data = await _mongoCollection.Find(filter).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
     }
 
-    public async Task UpdateAsync(T entity)
+    public async Task<TResult<T>> GetAsync(Guid id)
     {
-        if (entity is null)
-            throw new ArgumentNullException(nameof(entity));
+        var result = new TResult<T>();
+        try
+        {
+            if (id == Guid.Empty) throw new ArgumentException("Id cannot be empty", nameof(id));
 
-        var filter = _filterBuilder.Eq(x => x.Id, entity.Id);
-        var existing = await GetAsync(entity.Id);
-
-        if (existing is null)
-            throw new InvalidOperationException($"Entity with Id {entity.Id} not found.");
-
-        await _mongoCollection.ReplaceOneAsync(filter, entity);
+            var filter = _filterBuilder.Eq(x => x.Id, id);
+            var entity = await _mongoCollection.Find(filter).FirstOrDefaultAsync();
+            if (entity != null)
+                result.Data = entity;
+            else
+                result.Success = false;
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task<TResult<T>> GetAsync(Expression<Func<T, bool>> filter)
     {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Id cannot be empty", nameof(id));
+        var result = new TResult<T>();
+        try
+        {
+            var entity = await _mongoCollection.Find(filter).FirstOrDefaultAsync();
+            if (entity != null)
+                result.Data = entity;
+            else
+                result.Success = false;
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
+    }
 
-        var existing = await GetAsync(id);
-        if (existing is null)
-            throw new InvalidOperationException($"Entity with Id {id} not found.");
+    // ---- COMMAND: Transaction-safe ApplyChangesAsync ----
+    public async Task<TResult<T>> ApplyChangesAsync(T entity)
+    {
+        var result = new TResult<T>();
+        using var session = await _database.Client.StartSessionAsync();
 
-        var filter = _filterBuilder.Eq(x => x.Id, id);
-        await _mongoCollection.DeleteOneAsync(filter);
+        try
+        {
+            if (entity is null) throw new ArgumentNullException(nameof(entity));
+            if (entity is not IListEditEntities editable)
+                throw new InvalidOperationException(
+                    $"Entity of type {typeof(T).Name} must implement IListEditEntity."
+                );
+
+            session.StartTransaction();
+
+            if (editable.IsNew)
+            {
+                await _mongoCollection.InsertOneAsync(session, entity);
+            }
+            else
+            {
+                var filter = _filterBuilder.Eq(x => x.Id, entity.Id);
+                var replaceResult = await _mongoCollection.ReplaceOneAsync(session, filter, entity);
+                if (replaceResult.MatchedCount == 0)
+                    throw new InvalidOperationException($"Entity with Id {entity.Id} not found for update.");
+            }
+
+            await session.CommitTransactionAsync();
+        }
+        catch (Exception ex)
+        {
+            await session.AbortTransactionAsync();
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
+    }
+
+    public async Task<TResult<T>> DeleteAsync(Guid id)
+    {
+        var result = new TResult<T>();
+        try
+        {
+            if (id == Guid.Empty) throw new ArgumentException("Id cannot be empty", nameof(id));
+
+            var existing = await _mongoCollection
+                .Find(_filterBuilder.Eq(x => x.Id, id))
+                .FirstOrDefaultAsync();
+
+            if (existing is null)
+                throw new InvalidOperationException($"Entity with Id {id} not found.");
+
+            var filter = _filterBuilder.Eq(x => x.Id, id);
+            await _mongoCollection.DeleteOneAsync(filter);
+        }
+        catch (Exception ex)
+        {
+            result.Success = false;
+            result.Message = ex.Message;
+        }
+        return result;
     }
 }
