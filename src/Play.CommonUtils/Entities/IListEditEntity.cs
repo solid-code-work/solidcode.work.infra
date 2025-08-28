@@ -2,7 +2,7 @@ using MassTransit.Configuration;
 
 namespace Play.CommonUtils.Entities;
 
-public interface IListEditEntities
+public interface IListEditEntity
 {
     public bool IsNew { get; set; }
 }
