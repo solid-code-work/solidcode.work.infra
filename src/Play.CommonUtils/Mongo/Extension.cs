@@ -4,9 +4,9 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Play.CommonUtils.Configurations;
 using Play.CommonUtils.Entities;
 using Play.CommonUtils.Repositories;
-using Play.CommonUtils.Settings;
 
 namespace Play.CommonUtils.Mongo;
 

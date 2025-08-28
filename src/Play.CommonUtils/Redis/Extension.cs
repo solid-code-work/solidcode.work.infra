@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Play.CommonUtils.Settings;
+using Play.CommonUtils.Configurations;
 
 namespace Play.CommonUtils.Redis;
 
