@@ -1,4 +1,4 @@
-namespace Play.CommonUtils.Settings;
+namespace Play.CommonUtils.Configurations;
 
 public class MSSQLsettings
 {
