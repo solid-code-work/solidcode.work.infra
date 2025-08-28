@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="MassTransit.Aspnetcore" Version="7.3.1" />
     <PackageReference Include="MassTransit.RabbitMq" Version="8.5.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkcore" Version="9.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkcore.Sqlserver" Version="9.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkcore.tools" Version="9.0.8">
