@@ -1,7 +1,18 @@
-# solidcode.work.infra
+# 📖 About solidcode.work.infra
 
-**solidcode.work.infra** is a reusable infrastructure library designed to simplify integration with databases, caching, messaging, and HTTP clients in modern .NET applications.  
-It provides a consistent set of utilities, repositories, and helpers that make enterprise and industrial applications easier to build, maintain, and scale.
+Starting a new web application often means repeating the same setup steps: configuring databases, wiring up caching, adding messaging, setting up HTTP clients, and pulling in all the common packages. This process is time‑consuming, error‑prone, and something every developer ends up doing again and again for each project.
+
+I built **solidcode.work.infra** to make this process easy, fast, and standardized. Instead of spending hours on boilerplate setup, you can install this package from NuGet and immediately have a ready‑to‑use infrastructure layer that follows best practices and is consistent across projects.
+
+By utilizing this package:
+
+🚀 You can start projects faster with the essential building blocks already in place.  
+⚙️ Your applications are standardized and collaborative, reducing friction when working in teams.  
+📦 Common integrations (databases, caching, messaging, HTTP, logging) are pre‑configured and ready to extend.  
+
+This library is the backbone of my portfolio and reflects my approach to building clean, modular, and reusable infrastructure code for modern .NET applications. It’s designed to save time, enforce consistency, and let you focus on the unique parts of your project instead of reinventing the wheel.
+
+*Created and maintained by **Shahram Etemadi** as part of the [solidcode.work](https://solidcode.work) portfolio.*
 
 ---
 
@@ -23,6 +34,9 @@ It provides a consistent set of utilities, repositories, and helpers that make e
 - **Unified Responses**
   - `TResult<T>` and `TResultFactory` for consistent success/failure handling
   - `MessageErrorType` enum for standardized error classification
+- **Logging**
+  - Built-in `ILogger<T>` integration via `AddSolidcodeLogging()`
+  - Professional, structured logging with colors and file output via `UseSolidcodeSerilog()`
 
 ---
 
@@ -33,3 +47,5 @@ Clone the repository:
 ```bash
 git clone https://github.com/<your-username>/solidcode.work.infra.git
 cd solidcode.work.infra
+Or
+dotnet add package solidcode.work.infra
