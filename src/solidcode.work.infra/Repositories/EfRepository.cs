@@ -15,7 +15,6 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         _dbSet = context.Set<T>();
     }
 
-    // ---- QUERIES: Data is set ----
     public async Task<TResult<List<T>>> GetAllAsync()
     {
         try

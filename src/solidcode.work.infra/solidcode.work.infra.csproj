@@ -4,17 +4,33 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
     <AssemblyName>solidcode.work.infra</AssemblyName>
     <RootNamespace>solidcode.work.infra</RootNamespace>
+    <PackageId>solidcode.work.infra</PackageId>
+    <Version>1.0.4</Version>
+    <IsPackable>true</IsPackable>
+    <Authors>Shahram Etemadi</Authors>
+    <Company>solidcode.work</Company>
+    <Description>Reusable infrastructure library for EF Core, MongoDB, Redis, RabbitMQ, and resilient HTTP clients.</Description>
+    <PackageTags>infrastructure;efcore;mongodb;redis;rabbitmq;httpclient;microservices</PackageTags>
+    <RepositoryUrl>https://github.com/shahram-etemadi/solidcode.work.infra</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://solidcode.work</PackageProjectUrl>
+    <PackageReleaseNotes>Initial release of solidcode.work.infra with EF Core, MongoDB, Redis, RabbitMQ, and HTTP helpers.</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.jpg</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit.Aspnetcore" Version="7.3.1" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
     <PackageReference Include="MassTransit.RabbitMq" Version="8.5.2" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.3.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkcore" Version="9.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkcore.Sqlserver" Version="9.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkcore.tools" Version="9.0.8">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -25,9 +41,11 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.8" />
     <PackageReference Include="MongoDB.Bson" Version="3.4.3" />
-    <PackageReference Include="MongoDb.Driver" Version="3.4.3" />
+    <PackageReference Include="MongoDB.Driver" Version="3.4.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Polly" Version="8.6.3" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="icon.jpg" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
