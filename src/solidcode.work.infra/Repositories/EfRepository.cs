@@ -21,11 +21,15 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         try
         {
             var data = await _dbSet.ToListAsync();
-            return TResultFactory.Success(data, "Retrieved all entities.");
+
+            if (data.Count == 0)
+                return TResultFactory.Empty<List<T>>("No entities found.");
+
+            return TResultFactory.Ok(data, "Retrieved all entities.");
         }
         catch (Exception ex)
         {
-            return TResultFactory.Fail<List<T>>(ex.Message);
+            return TResultFactory.Error<List<T>>(ex.Message);
         }
     }
 
@@ -34,11 +38,15 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         try
         {
             var data = await _dbSet.Where(filter).ToListAsync();
-            return TResultFactory.Success(data, "Filtered entities retrieved.");
+
+            if (data.Count == 0)
+                return TResultFactory.Empty<List<T>>("No matching entities found.");
+
+            return TResultFactory.Ok(data, "Filtered entities retrieved.");
         }
         catch (Exception ex)
         {
-            return TResultFactory.Fail<List<T>>(ex.Message);
+            return TResultFactory.Error<List<T>>(ex.Message);
         }
     }
 
@@ -47,18 +55,18 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         try
         {
             if (id == Guid.Empty)
-                return TResultFactory.Fail<T>("Id cannot be empty");
+                return TResultFactory.BadRequest<T>("Id cannot be empty.");
 
             var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
 
             if (entity != null)
-                return TResultFactory.Success(entity, "Entity found.");
+                return TResultFactory.Ok(entity, "Entity found.");
             else
-                return TResultFactory.Fail<T>($"Entity with Id {id} not found.");
+                return TResultFactory.NotFound<T>($"Entity with Id {id} not found.");
         }
         catch (Exception ex)
         {
-            return TResultFactory.Fail<T>(ex.Message);
+            return TResultFactory.Error<T>(ex.Message);
         }
     }
 
@@ -69,13 +77,13 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
             var entity = await _dbSet.FirstOrDefaultAsync(filter);
 
             if (entity != null)
-                return TResultFactory.Success(entity, "Entity found.");
+                return TResultFactory.Ok(entity, "Entity found.");
             else
-                return TResultFactory.Fail<T>("No matching entity found.");
+                return TResultFactory.NotFound<T>("No matching entity found.");
         }
         catch (Exception ex)
         {
-            return TResultFactory.Fail<T>(ex.Message);
+            return TResultFactory.Error<T>(ex.Message);
         }
     }
 
@@ -85,10 +93,10 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         try
         {
             if (entity is null)
-                return TResultFactory.Fail<T>("Entity cannot be null");
+                return TResultFactory.BadRequest<T>("Entity cannot be null.");
 
             if (entity is not IListEditEntity editable)
-                return TResultFactory.Fail<T>($"Entity of type {typeof(T).Name} must implement IListEditEntity to use ApplyChangesAsync.");
+                return TResultFactory.BadRequest<T>($"Entity of type {typeof(T).Name} must implement IListEditEntity to use ApplyChangesAsync.");
 
             if (editable.IsNew)
             {
@@ -98,18 +106,18 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
             {
                 var existing = await _dbSet.FirstOrDefaultAsync(x => x.Id == entity.Id);
                 if (existing is null)
-                    return TResultFactory.Fail<T>($"Entity with Id {entity.Id} not found.");
+                    return TResultFactory.NotFound<T>($"Entity with Id {entity.Id} not found.");
 
                 _context.Entry(existing).CurrentValues.SetValues(entity);
             }
 
             await _context.SaveChangesAsync();
 
-            return TResultFactory.Success(entity, "Changes saved successfully.");
+            return TResultFactory.Ok(entity, "Changes saved successfully.");
         }
         catch (Exception ex)
         {
-            return TResultFactory.Fail<T>(ex.Message);
+            return TResultFactory.Error<T>(ex.Message);
         }
     }
 
@@ -118,21 +126,21 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         try
         {
             if (id == Guid.Empty)
-                return TResultFactory.Fail<T>("Id cannot be empty");
+                return TResultFactory.BadRequest<T>("Id cannot be empty.");
 
             var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
 
             if (entity is null)
-                return TResultFactory.Fail<T>($"Entity with Id {id} not found.");
+                return TResultFactory.NotFound<T>($"Entity with Id {id} not found.");
 
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
 
-            return TResultFactory.Success(entity, "Entity deleted successfully.");
+            return TResultFactory.Ok(entity, "Entity deleted successfully.");
         }
         catch (Exception ex)
         {
-            return TResultFactory.Fail<T>(ex.Message);
+            return TResultFactory.Error<T>(ex.Message);
         }
     }
 }

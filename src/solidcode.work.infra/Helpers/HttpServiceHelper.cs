@@ -3,28 +3,6 @@ using solidcode.work.infra.Entities;
 
 namespace solidcode.work.infra.Helpers
 {
-    //In Program.cs of the consuming app:
-    //services.AddCommonHttpClient();
-    //
-    // Example:
-    //
-    // private readonly HttpServiceHelper _http;
-
-    // public MyService(HttpServiceHelper http)
-    // {
-    //     _http = http;
-    // }
-
-    // public async Task TestCalls()
-    // {
-    //     // GET example
-    //     var getResult = await _http.GetAsync<List<UserDto>>("users");
-
-    //     // POST example
-    //     var postResult = await _http.PostAsync<CreateUserRequest, UserDto>("users", new CreateUserRequest { Name = "Alice" });
-    // }
-    //
-    //
     public class HttpServiceHelper
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -36,7 +14,6 @@ namespace solidcode.work.infra.Helpers
 
         public async Task<TResult<T>> GetAsync<T>(string endpoint) where T : class
         {
-            var result = new TResult<T>();
             try
             {
                 var client = _httpClientFactory.CreateClient("CommonHttpClient");
@@ -44,29 +21,31 @@ namespace solidcode.work.infra.Helpers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    result.Data = await response.Content.ReadFromJsonAsync<T>();
-                    result.Success = true;
+                    var data = await response.Content.ReadFromJsonAsync<T>();
+                    return TResultFactory.Ok(data!, "GET request successful.");
                 }
                 else
                 {
-                    result.Success = false;
-                    result.Message = $"HTTP {response.StatusCode}: {await response.Content.ReadAsStringAsync()}";
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    return new TResult<T>
+                    {
+                        IsSuccess = false,
+                        StatusCode = (int)response.StatusCode,
+                        Message = $"HTTP {response.StatusCode}: {errorMessage}",
+                        ErrorType = MapErrorType(response.StatusCode)
+                    };
                 }
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = ex.Message;
+                return TResultFactory.Error<T>(ex.Message);
             }
-
-            return result;
         }
 
         public async Task<TResult<TResponse>> PostAsync<TRequest, TResponse>(string endpoint, TRequest payload)
             where TResponse : class
             where TRequest : class
         {
-            var result = new TResult<TResponse>();
             try
             {
                 var client = _httpClientFactory.CreateClient("CommonHttpClient");
@@ -74,22 +53,39 @@ namespace solidcode.work.infra.Helpers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    result.Data = await response.Content.ReadFromJsonAsync<TResponse>();
-                    result.Success = true;
+                    var data = await response.Content.ReadFromJsonAsync<TResponse>();
+                    return TResultFactory.Ok(data!, "POST request successful.");
                 }
                 else
                 {
-                    result.Success = false;
-                    result.Message = $"HTTP {response.StatusCode}: {await response.Content.ReadAsStringAsync()}";
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    return new TResult<TResponse>
+                    {
+                        IsSuccess = false,
+                        StatusCode = (int)response.StatusCode,
+                        Message = $"HTTP {response.StatusCode}: {errorMessage}",
+                        ErrorType = MapErrorType(response.StatusCode)
+                    };
                 }
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = ex.Message;
+                return TResultFactory.Error<TResponse>(ex.Message);
             }
-
-            return result;
         }
+
+        // Helper to map HTTP status codes to MessageErrorType
+        private static MessageErrorType MapErrorType(System.Net.HttpStatusCode statusCode) =>
+    statusCode switch
+    {
+        System.Net.HttpStatusCode.BadRequest => MessageErrorType.Validation,
+        System.Net.HttpStatusCode.Unauthorized => MessageErrorType.Unauthorized,
+        System.Net.HttpStatusCode.NotFound => MessageErrorType.NotFound,
+        System.Net.HttpStatusCode.Conflict => MessageErrorType.Conflict,
+        System.Net.HttpStatusCode.InternalServerError => MessageErrorType.Exception,
+        System.Net.HttpStatusCode.NoContent => MessageErrorType.EmptyResult,
+        _ => MessageErrorType.Exception
+    };
+
     }
 }

@@ -2,16 +2,52 @@ namespace solidcode.work.infra.Entities;
 
 public static class TResultFactory
 {
-    public static TResult<T> Success<T>(T? data, string message = "") where T : class
-    {
-        return new TResult<T> { Success = true, RequestSuccess = true, Data = data, Message = message };
-    }
+    public static TResult<T> Ok<T>(T data, string? message = null) =>
+        new TResult<T>
+        {
+            IsSuccess = true,
+            StatusCode = 200,
+            Data = data,
+            Message = message,
+            ErrorType = MessageErrorType.Success
+        };
 
-    public static TResult<T> Fail<T>(string message = "", MessageErrorType? errorType = null) where T : class
-    {
-        return new TResult<T> { Success = false, RequestSuccess = true, Message = message, Data = null, MessageErrorType = errorType };
-    }
+    public static TResult<T> BadRequest<T>(string message) =>
+        new TResult<T>
+        {
+            IsSuccess = false,
+            StatusCode = 400,
+            Message = message,
+            ErrorType = MessageErrorType.Validation
+        };
 
-    public static TResult<object> Success(string message = "") => Success<object>(null, message);
-    public static TResult<object> Fail(string message = "", MessageErrorType? errorType = null) => Fail<object>(message, errorType);
+    public static TResult<T> NotFound<T>(string message) =>
+        new TResult<T>
+        {
+            IsSuccess = false,
+            StatusCode = 404,
+            Message = message,
+            ErrorType = MessageErrorType.NotFound
+        };
+
+    public static TResult<T> Error<T>(string message) =>
+        new TResult<T>
+        {
+            IsSuccess = false,
+            StatusCode = 500,
+            Message = message,
+            ErrorType = MessageErrorType.Exception
+        };
+
+    // ✅ Add this for empty results
+    public static TResult<T> Empty<T>(string message = "No content") =>
+        new TResult<T>
+        {
+            IsSuccess = true,
+            StatusCode = 204, // HTTP 204 No Content
+            Data = default,
+            Message = message,
+            ErrorType = MessageErrorType.EmptyResult
+        };
 }
+

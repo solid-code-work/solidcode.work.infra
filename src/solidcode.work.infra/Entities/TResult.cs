@@ -1,20 +1,12 @@
 ﻿namespace solidcode.work.infra.Entities;
 
-public class TResult<T> where T : class
+public class TResult<T>
 {
-    public T? Data { get; set; }
-    public List<OutputItem> OutputItems { get; set; }
-
-    public TResult()
-    {
-        OutputItems = new List<OutputItem>();
-    }
-
-    public bool RequestSuccess { get; set; }
-    public bool Success { get; set; }
-    public string? Message { get; set; }
-    public string? Warning { get; set; }
-    public string? Fkey { get; set; }
-    public int PkIntValue { get; set; }
-    public MessageErrorType? MessageErrorType { get; set; }
+    public bool IsSuccess { get; init; }              // Success flag
+    public int StatusCode { get; init; }              // HTTP status code (200, 400, 404, etc.)
+    public T? Data { get; init; }                     // Payload
+    public string? Message { get; init; }             // Success or error message
+    public MessageErrorType? ErrorType { get; init; } // Enum for error classification
+    public List<OutputItem>? OutputItems { get; init; } // Optional extra info
+    public string? Warning { get; init; }             // Optional warning
 }
