@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
     <AssemblyName>solidcode.work.infra</AssemblyName>
     <RootNamespace>solidcode.work.infra</RootNamespace>
     <PackageId>solidcode.work.infra</PackageId>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <IsPackable>true</IsPackable>
     <Authors>Shahram Etemadi</Authors>
     <Company>solidcode.work</Company>
@@ -22,6 +22,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.jpg</PackageIcon>
+    
   </PropertyGroup>
 
   <ItemGroup>
