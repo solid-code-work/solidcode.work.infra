@@ -43,4 +43,3 @@ public static class Extension
         return services;
     }
 }
-
