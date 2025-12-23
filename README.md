@@ -1,6 +1,6 @@
 # solidcode.work.infra
 
-**solidcode.work.infra** is a reusable infrastructure library designed to simplify integration with databases, caching, messaging, and HTTP clients in modern .NET applications.  
+**solidcode.work.infra** is a reusable infrastructure library designed to simplify integration with databases, caching, messaging, HTTP clients, and logging in modern .NET applications.  
 It provides a consistent set of utilities, repositories, and helpers that make enterprise and industrial applications easier to build, maintain, and scale.
 
 ---
@@ -23,6 +23,9 @@ It provides a consistent set of utilities, repositories, and helpers that make e
 - **Unified Responses**
   - `TResult<T>` and `TResultFactory` for consistent success/failure handling
   - `MessageErrorType` enum for standardized error classification
+- **Logging**
+  - Built-in `ILogger<T>` integration via `AddSolidcodeLogging()`
+  - Professional, structured logging with colors and file output via `UseSolidcodeSerilog()`
 
 ---
 
@@ -33,3 +36,8 @@ Clone the repository:
 ```bash
 git clone https://github.com/<your-username>/solidcode.work.infra.git
 cd solidcode.work.infra
+
+Or install via NuGet:
+
+dotnet add package solidcode.work.infra
+
