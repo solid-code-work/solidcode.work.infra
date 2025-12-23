@@ -5,7 +5,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 
 namespace solidcode.work.infra.Logging;
 
-public static class SerilogServiceCollectionExtensions
+public static class Extensions
 {
     /// <summary>
     /// Configures Serilog with sensible defaults (console + file, structured output, colors).
