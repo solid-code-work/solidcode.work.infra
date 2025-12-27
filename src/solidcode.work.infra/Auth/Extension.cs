@@ -32,7 +32,6 @@ public static class Extension
 
         services.AddAuthorization();
 
-        // 👇 Register the helper
         services.AddScoped<JwtTokenHelper>();
 
         return services;
