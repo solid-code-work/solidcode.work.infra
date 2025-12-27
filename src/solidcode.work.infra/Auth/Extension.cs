@@ -1,30 +1,20 @@
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using solidcode.work.infra.Configurations;
-using System.Text;
-
-namespace solidcode.work.infra.Authentication;
+using solidcode.work.infra.security;
 
 public static class Extension
 {
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer((serviceProvider, options) =>
+            .AddJwtBearer(options =>
             {
-                var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+                var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
                 var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();
-
-                if (string.IsNullOrWhiteSpace(jwtSettings?.SecretKey))
-                    throw new ArgumentException("JwtSettings:SecretKey is missing or invalid.");
-
-                if (string.IsNullOrWhiteSpace(jwtSettings?.Issuer))
-                    throw new ArgumentException("JwtSettings:Issuer is missing or invalid.");
-
-                if (string.IsNullOrWhiteSpace(jwtSettings?.Audience))
-                    throw new ArgumentException("JwtSettings:Audience is missing or invalid.");
 
                 var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
 
@@ -39,6 +29,11 @@ public static class Extension
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
             });
+
+        services.AddAuthorization();
+
+        // 👇 Register the helper
+        services.AddScoped<JwtTokenHelper>();
 
         return services;
     }
