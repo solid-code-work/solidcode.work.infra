@@ -8,7 +8,7 @@
     <AssemblyName>solidcode.work.infra</AssemblyName>
     <RootNamespace>solidcode.work.infra</RootNamespace>
     <PackageId>solidcode.work.infra</PackageId>
-    <Version>1.0.9</Version>
+    <Version>1.1.0</Version>
     <IsPackable>true</IsPackable>
     <Authors>Shahram Etemadi</Authors>
     <Company>solidcode.work</Company>
