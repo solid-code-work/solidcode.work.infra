@@ -1,6 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
 namespace solidcode.work.infra.Logging;
@@ -8,25 +8,66 @@ namespace solidcode.work.infra.Logging;
 public static class Extensions
 {
     /// <summary>
-    /// Configures Serilog with sensible defaults (console + file, structured output, colors).
+    /// Configures Serilog with solid defaults and full configuration support.
+    /// Works for WebAPI, Worker, and Console apps.
     /// </summary>
-    public static IHostBuilder AddLogging(this IHostBuilder hostBuilder)
+    public static IHostBuilder AddSolidcodeLogging(this IHostBuilder hostBuilder)
     {
-        hostBuilder.UseSerilog((ctx, cfg) =>
+        hostBuilder.UseSerilog((context, services, logger) =>
         {
-            cfg.ReadFrom.Configuration(ctx.Configuration) // allow overrides via appsettings.json
-               .Enrich.FromLogContext()
-               .WriteTo.Console(
-                   outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
-                   theme: AnsiConsoleTheme.Code
-               )
-               .WriteTo.File("logs/solidcode.log",
-                   rollingInterval: RollingInterval.Day,
-                   outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-               );
+            logger
+                // -----------------------------
+                // Configuration first (highest priority)
+                // -----------------------------
+                .ReadFrom.Configuration(context.Configuration)
+
+                // -----------------------------
+                // Sensible defaults (fallbacks)
+                // -----------------------------
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+
+                // -----------------------------
+                // Enrichment (structured metadata)
+                // -----------------------------
+                .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .Enrich.WithEnvironmentName()
+                .Enrich.WithProcessId()
+                .Enrich.WithThreadId()
+
+                // -----------------------------
+                // Console sink (developer friendly)
+                // -----------------------------
+                .WriteTo.Console(
+                    theme: AnsiConsoleTheme.Code,
+                    outputTemplate:
+                        "[{Timestamp:HH:mm:ss} {Level:u3}] " +
+                        "[{Environment}] " +
+                        "[{CorrelationId}] " +
+                        "[{UserId}] " +
+                        "{Message:lj}{NewLine}{Exception}"
+                )
+
+                // -----------------------------
+                // File sink (production safe)
+                // -----------------------------
+                .WriteTo.File(
+                    path: "logs/solidcode-.log",
+                    rollingInterval: RollingInterval.Day,
+                    retainedFileCountLimit: 14,
+                    shared: true,
+                    outputTemplate:
+                        "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] " +
+                        "[{Environment}] " +
+                        "[{CorrelationId}] " +
+                        "[{UserId}] " +
+                        "{Message:lj}{NewLine}{Exception}"
+                );
         });
 
         return hostBuilder;
     }
 }
-

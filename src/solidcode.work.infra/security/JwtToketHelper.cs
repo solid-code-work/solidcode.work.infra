@@ -1,44 +1,110 @@
-
+using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using solidcode.work.infra.Configurations;
 
 namespace solidcode.work.infra.security;
 
-public class JwtTokenHelper
+public sealed class JwtTokenHelper
 {
-    private readonly JwtSettings _jwtSettings;
+    private readonly JwtSettings _settings;
+    private readonly SymmetricSecurityKey _signingKey;
 
-    public JwtTokenHelper(IConfiguration config)
+    public JwtTokenHelper(IOptions<JwtSettings> options)
     {
-        _jwtSettings = config.GetSection(nameof(JwtSettings)).Get<JwtSettings>()
-            ?? throw new ArgumentException("JwtSettings section is missing.");
+        _settings = options?.Value
+            ?? throw new ArgumentNullException(nameof(options));
+
+        ValidateSettings(_settings);
+
+        // Create signing key once (cleaner & safer)
+        _signingKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_settings.SecretKey));
     }
 
-    public string GenerateToken(string userName, string role)
+    /// <summary>
+    /// Generates a signed JWT access token.
+    /// </summary>
+    public string GenerateToken(
+        string userId,
+        string userName,
+        IEnumerable<string> roles,
+        IDictionary<string, string>? additionalClaims = null)
     {
-        if (string.IsNullOrWhiteSpace(_jwtSettings.SecretKey))
-            throw new ArgumentException("JwtSettings:SecretKey is missing or invalid.");
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ArgumentException("userId is required.", nameof(userId));
 
-        var claims = new[]
+        if (string.IsNullOrWhiteSpace(userName))
+            throw new ArgumentException("userName is required.", nameof(userName));
+
+        var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, userName),
-            new Claim(ClaimTypes.Role, role)
+            new Claim(ClaimTypes.NameIdentifier, userId),
+            new Claim(ClaimTypes.Name, userName)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        // Roles (safe against null / empty)
+        if (roles != null)
+        {
+            foreach (var role in roles)
+            {
+                if (!string.IsNullOrWhiteSpace(role))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+                }
+            }
+        }
 
+        // Additional custom claims
+        if (additionalClaims != null)
+        {
+            foreach (var claim in additionalClaims)
+            {
+                if (!string.IsNullOrWhiteSpace(claim.Key) &&
+                    !string.IsNullOrWhiteSpace(claim.Value))
+                {
+                    claims.Add(new Claim(claim.Key, claim.Value));
+                }
+            }
+        }
+
+        var credentials = new SigningCredentials(
+            _signingKey,
+            SecurityAlgorithms.HmacSha256);
+
+        // ⚠️ IMPORTANT:
+        // DO NOT set `notBefore` (nbf) – causes clock-related 401 errors
         var token = new JwtSecurityToken(
-            issuer: _jwtSettings.Issuer,
-            audience: _jwtSettings.Audience,
+            issuer: _settings.Issuer,
+            audience: _settings.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
-            signingCredentials: creds);
+            expires: DateTime.UtcNow.AddMinutes(_settings.ExpiryMinutes),
+            signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private static void ValidateSettings(JwtSettings settings)
+    {
+        if (string.IsNullOrWhiteSpace(settings.SecretKey))
+            throw new InvalidOperationException("JwtSettings:SecretKey is missing.");
+
+        if (settings.SecretKey.Length < 32)
+            throw new InvalidOperationException(
+                "JwtSettings:SecretKey must be at least 32 characters long.");
+
+        if (string.IsNullOrWhiteSpace(settings.Issuer))
+            throw new InvalidOperationException("JwtSettings:Issuer is missing.");
+
+        if (string.IsNullOrWhiteSpace(settings.Audience))
+            throw new InvalidOperationException("JwtSettings:Audience is missing.");
+
+        if (settings.ExpiryMinutes <= 0)
+            throw new InvalidOperationException(
+                "JwtSettings:ExpiryMinutes must be greater than zero.");
     }
 }

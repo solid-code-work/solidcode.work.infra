@@ -8,7 +8,7 @@
     <AssemblyName>solidcode.work.infra</AssemblyName>
     <RootNamespace>solidcode.work.infra</RootNamespace>
     <PackageId>solidcode.work.infra</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.3.7</Version>
     <IsPackable>true</IsPackable>
     <Authors>Shahram Etemadi</Authors>
     <Company>solidcode.work</Company>
@@ -25,32 +25,93 @@
     
   </PropertyGroup>
 
+<ItemGroup>
+  <FrameworkReference Include="Microsoft.AspNetCore.App" />
+</ItemGroup>
+ <!-- ========================= -->
+<!-- SWAGGER / OPENAPI         -->
+<!-- ========================= -->
+<ItemGroup>
+  <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+</ItemGroup>
+
+<ItemGroup>
+  <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
+  <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
+  <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+</ItemGroup>
+  <!-- JWT -->
   <ItemGroup>
   <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
-  <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.1" />
+  <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.7.0" />
+  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.7.0" />
+</ItemGroup>
+
+<!-- ========================= -->
+<!-- MESSAGING (MassTransit)   -->
+<!-- ========================= -->
+<ItemGroup>
   <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
   <PackageReference Include="MassTransit.RabbitMq" Version="8.5.2" />
-  <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.3.0" />
+</ItemGroup>
+
+<!-- ========================= -->
+<!-- DATA / ORM                -->
+<!-- ========================= -->
+<ItemGroup>
   <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
   <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
+  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+
+  <!-- EF Core tooling (not exposed transitively) -->
   <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
-  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-  <PrivateAssets>all</PrivateAssets>
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
   </PackageReference>
+</ItemGroup>
+
+<!-- ========================= -->
+<!-- MONGODB                   -->
+<!-- ========================= -->
+<ItemGroup>
+  <PackageReference Include="MongoDB.Bson" Version="3.4.3" />
+  <PackageReference Include="MongoDB.Driver" Version="3.4.3" />
+</ItemGroup>
+
+<!-- ========================= -->
+<!-- CACHING / CONFIG / HTTP   -->
+<!-- ========================= -->
+<ItemGroup>
   <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.8" />
   <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
   <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.8" />
   <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
   <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
   <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.8" />
-  <PackageReference Include="MongoDB.Bson" Version="3.4.3" />
-  <PackageReference Include="MongoDB.Driver" Version="3.4.3" />
-  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+</ItemGroup>
+
+<!-- ========================= -->
+<!-- RESILIENCE                -->
+<!-- ========================= -->
+<ItemGroup>
   <PackageReference Include="Polly" Version="8.6.3" />
+</ItemGroup>
+
+<!-- ========================= -->
+<!-- LOGGING                   -->
+<!-- ========================= -->
+<ItemGroup>
+  <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+  <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+</ItemGroup>
+
+<!-- ========================= -->
+<!-- PACKAGE CONTENT           -->
+<!-- ========================= -->
+<ItemGroup>
   <None Include="README.md" Pack="true" PackagePath="" />
   <None Include="icon.jpg" Pack="true" PackagePath="" />
-  <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
-  <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-  </ItemGroup>
+</ItemGroup>
+
 
 </Project>

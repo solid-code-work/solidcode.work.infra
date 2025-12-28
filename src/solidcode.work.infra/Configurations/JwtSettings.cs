@@ -1,9 +1,20 @@
+using Microsoft.IdentityModel.Tokens;
+
 namespace solidcode.work.infra.Configurations;
 
-public class JwtSettings
+public sealed class JwtSettings
 {
-    public string? SecretKey { get; set; }
-    public string? Issuer { get; set; }
-    public string? Audience { get; set; }
-    public int ExpiryMinutes { get; set; } = 30;
+    public string SecretKey { get; init; } = string.Empty;
+    public string Issuer { get; init; } = string.Empty;
+    public string Audience { get; init; } = string.Empty;
+    public int ExpiryMinutes { get; init; } = 60;
+    public int RefreshTokenExpiryDays { get; init; } = 7;
+    public string SigningAlgorithm { get; init; } = SecurityAlgorithms.HmacSha256;
 }
+
+
+
+
+
+
+
