@@ -32,7 +32,6 @@ namespace solidcode.work.infra.Helpers
                         IsSuccess = false,
                         StatusCode = (int)response.StatusCode,
                         Message = $"HTTP {response.StatusCode}: {errorMessage}",
-                        ErrorType = MapErrorType(response.StatusCode)
                     };
                 }
             }
@@ -64,7 +63,6 @@ namespace solidcode.work.infra.Helpers
                         IsSuccess = false,
                         StatusCode = (int)response.StatusCode,
                         Message = $"HTTP {response.StatusCode}: {errorMessage}",
-                        ErrorType = MapErrorType(response.StatusCode)
                     };
                 }
             }

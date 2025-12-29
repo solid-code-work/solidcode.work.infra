@@ -1,6 +1,6 @@
 ﻿namespace solidcode.work.infra.Entities;
 
-public class BaseResponseViewModel
+public class BaseResponseViewModel_old
 {
     public required bool RequestSuccess { get; set; }
     public required bool Success { get; set; }

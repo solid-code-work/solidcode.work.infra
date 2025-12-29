@@ -1,18 +1,24 @@
 using System.Linq.Expressions;
 using solidcode.work.infra.Entities;
 
-namespace solidcode.work.infra.Repositories
-{
-    public interface IRepository<T> where T : class, IEntity
-    {
-        // Command methods: Data is typically null, only Success/Message populated
-        Task<TResult<T>> ApplyChangesAsync(T entity);
-        Task<TResult<T>> DeleteAsync(Guid id);
+namespace solidcode.work.infra.Repositories;
 
-        // Query methods: Data is populated with entities
-        Task<TResult<List<T>>> GetAllAsync();
-        Task<TResult<List<T>>> GetAllAsync(Expression<Func<T, bool>> filter);
-        Task<TResult<T>> GetAsync(Guid id);
-        Task<TResult<T>> GetAsync(Expression<Func<T, bool>> filter);
-    }
+public interface IRepository<T> where T : class, IEntity
+{
+    // ------------------------
+    // QUERIES
+    // ------------------------
+
+    Task<TResult<List<T>>> GetAllAsync();
+    Task<TResult<List<T>>> GetAllAsync(Expression<Func<T, bool>> filter);
+    Task<TResult<T>> GetAsync(Guid id);
+    Task<TResult<T>> GetAsync(Expression<Func<T, bool>> filter);
+
+    // ------------------------
+    // COMMANDS
+    // ------------------------
+
+    Task<TResult> CreateAsync(T entity);
+    Task<TResult> UpdateAsync(T entity);
+    Task<TResult> DeleteAsync(Guid id);
 }

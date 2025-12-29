@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using solidcode.work.infra.Entities;
-using solidcode.work.infra.Repositories;
 using solidcode.work.infra.Configurations;
 
 namespace solidcode.work.infra.PostgreSQL;

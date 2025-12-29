@@ -6,27 +6,29 @@ namespace solidcode.work.infra.Repositories;
 
 public class MongoRepository<T> : IRepository<T> where T : class, IEntity
 {
-    private readonly IMongoCollection<T> _mongoCollection;
-    private readonly IMongoDatabase _database;
-    private readonly FilterDefinitionBuilder<T> _filterBuilder = Builders<T>.Filter;
+    private readonly IMongoCollection<T> _collection;
+    private readonly FilterDefinitionBuilder<T> _filter = Builders<T>.Filter;
 
     public MongoRepository(IMongoDatabase database, string collectionName)
     {
-        _database = database;
-        _mongoCollection = database.GetCollection<T>(collectionName);
+        _collection = database.GetCollection<T>(collectionName);
     }
 
-    // ---- QUERIES ----
+    // ------------------------
+    // QUERIES
+    // ------------------------
+
     public async Task<TResult<List<T>>> GetAllAsync()
     {
         try
         {
-            var data = await _mongoCollection.Find(_filterBuilder.Empty).ToListAsync();
+            var data = await _collection
+                .Find(_filter.Empty)
+                .ToListAsync();
 
-            if (data.Count == 0)
-                return TResultFactory.Empty<List<T>>("No entities found.");
-
-            return TResultFactory.Ok(data, "Retrieved all entities.");
+            return data.Count == 0
+                ? TResultFactory.NoContent<List<T>>("No entities found.")
+                : TResultFactory.Ok(data, "Entities retrieved successfully.");
         }
         catch (Exception ex)
         {
@@ -38,12 +40,13 @@ public class MongoRepository<T> : IRepository<T> where T : class, IEntity
     {
         try
         {
-            var data = await _mongoCollection.Find(filter).ToListAsync();
+            var data = await _collection
+                .Find(filter)
+                .ToListAsync();
 
-            if (data.Count == 0)
-                return TResultFactory.Empty<List<T>>("No matching entities found.");
-
-            return TResultFactory.Ok(data, "Filtered entities retrieved.");
+            return data.Count == 0
+                ? TResultFactory.NoContent<List<T>>("No matching entities found.")
+                : TResultFactory.Ok(data, "Filtered entities retrieved successfully.");
         }
         catch (Exception ex)
         {
@@ -53,17 +56,18 @@ public class MongoRepository<T> : IRepository<T> where T : class, IEntity
 
     public async Task<TResult<T>> GetAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            return TResultFactory.BadRequest<T>("Id cannot be empty.");
+
         try
         {
-            if (id == Guid.Empty)
-                return TResultFactory.BadRequest<T>("Id cannot be empty.");
+            var entity = await _collection
+                .Find(_filter.Eq(x => x.Id, id))
+                .FirstOrDefaultAsync();
 
-            var entity = await _mongoCollection.Find(_filterBuilder.Eq(x => x.Id, id)).FirstOrDefaultAsync();
-
-            if (entity != null)
-                return TResultFactory.Ok(entity, "Entity found.");
-            else
-                return TResultFactory.NotFound<T>($"Entity with Id {id} not found.");
+            return entity is null
+                ? TResultFactory.NotFound<T>($"Entity with Id {id} not found.")
+                : TResultFactory.Ok(entity, "Entity found.");
         }
         catch (Exception ex)
         {
@@ -75,12 +79,13 @@ public class MongoRepository<T> : IRepository<T> where T : class, IEntity
     {
         try
         {
-            var entity = await _mongoCollection.Find(filter).FirstOrDefaultAsync();
+            var entity = await _collection
+                .Find(filter)
+                .FirstOrDefaultAsync();
 
-            if (entity != null)
-                return TResultFactory.Ok(entity, "Entity found.");
-            else
-                return TResultFactory.NotFound<T>("No matching entity found.");
+            return entity is null
+                ? TResultFactory.NotFound<T>("No matching entity found.")
+                : TResultFactory.Ok(entity, "Entity found.");
         }
         catch (Exception ex)
         {
@@ -88,65 +93,67 @@ public class MongoRepository<T> : IRepository<T> where T : class, IEntity
         }
     }
 
-    // ---- COMMANDS ----
-    public async Task<TResult<T>> ApplyChangesAsync(T entity)
+    // ------------------------
+    // COMMANDS
+    // ------------------------
+
+    public async Task<TResult> CreateAsync(T entity)
     {
-        using var session = await _database.Client.StartSessionAsync();
+        if (entity is null)
+            return TResultFactory.BadRequest("Entity cannot be null.");
 
         try
         {
-            if (entity is null)
-                return TResultFactory.BadRequest<T>("Entity cannot be null.");
-
-            if (entity is not IListEditEntity editable)
-                return TResultFactory.BadRequest<T>($"Entity of type {typeof(T).Name} must implement IListEditEntity.");
-
-            session.StartTransaction();
-
-            if (editable.IsNew)
-            {
-                await _mongoCollection.InsertOneAsync(session, entity);
-            }
-            else
-            {
-                var filter = _filterBuilder.Eq(x => x.Id, entity.Id);
-                var replaceResult = await _mongoCollection.ReplaceOneAsync(session, filter, entity);
-
-                if (replaceResult.MatchedCount == 0)
-                {
-                    await session.AbortTransactionAsync();
-                    return TResultFactory.NotFound<T>($"Entity with Id {entity.Id} not found for update.");
-                }
-            }
-
-            await session.CommitTransactionAsync();
-            return TResultFactory.Ok(entity, "Changes saved successfully.");
+            await _collection.InsertOneAsync(entity);
+            return TResultFactory.Created("Entity created successfully.");
         }
         catch (Exception ex)
         {
-            await session.AbortTransactionAsync();
-            return TResultFactory.Error<T>(ex.Message);
+            return TResultFactory.Error(ex.Message);
         }
     }
 
-    public async Task<TResult<T>> DeleteAsync(Guid id)
+    public async Task<TResult> UpdateAsync(T entity)
     {
+        if (entity is null)
+            return TResultFactory.BadRequest("Entity cannot be null.");
+
+        if (entity.Id == Guid.Empty)
+            return TResultFactory.BadRequest("Entity Id cannot be empty.");
+
         try
         {
-            if (id == Guid.Empty)
-                return TResultFactory.BadRequest<T>("Id cannot be empty.");
+            var result = await _collection.ReplaceOneAsync(
+                _filter.Eq(x => x.Id, entity.Id),
+                entity);
 
-            var existing = await _mongoCollection.Find(_filterBuilder.Eq(x => x.Id, id)).FirstOrDefaultAsync();
-
-            if (existing is null)
-                return TResultFactory.NotFound<T>($"Entity with Id {id} not found.");
-
-            await _mongoCollection.DeleteOneAsync(_filterBuilder.Eq(x => x.Id, id));
-            return TResultFactory.Ok(existing, "Entity deleted successfully.");
+            return result.MatchedCount == 0
+                ? TResultFactory.NotFound($"Entity with Id {entity.Id} not found.")
+                : TResultFactory.Ok("Entity updated successfully.");
         }
         catch (Exception ex)
         {
-            return TResultFactory.Error<T>(ex.Message);
+            return TResultFactory.Error(ex.Message);
+        }
+    }
+
+    public async Task<TResult> DeleteAsync(Guid id)
+    {
+        if (id == Guid.Empty)
+            return TResultFactory.BadRequest("Id cannot be empty.");
+
+        try
+        {
+            var result = await _collection.DeleteOneAsync(
+                _filter.Eq(x => x.Id, id));
+
+            return result.DeletedCount == 0
+                ? TResultFactory.NotFound($"Entity with Id {id} not found.")
+                : TResultFactory.Ok("Entity deleted successfully.");
+        }
+        catch (Exception ex)
+        {
+            return TResultFactory.Error(ex.Message);
         }
     }
 }

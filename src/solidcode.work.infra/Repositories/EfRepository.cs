@@ -15,16 +15,21 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         _dbSet = context.Set<T>();
     }
 
+    // ------------------------
+    // QUERIES
+    // ------------------------
+
     public async Task<TResult<List<T>>> GetAllAsync()
     {
         try
         {
-            var data = await _dbSet.ToListAsync();
+            var data = await _dbSet
+                .AsNoTracking()
+                .ToListAsync();
 
-            if (data.Count == 0)
-                return TResultFactory.Empty<List<T>>("No entities found.");
-
-            return TResultFactory.Ok(data, "Retrieved all entities.");
+            return data.Count == 0
+                ? TResultFactory.NoContent<List<T>>("No entities found.")
+                : TResultFactory.Ok(data, "Entities retrieved successfully.");
         }
         catch (Exception ex)
         {
@@ -36,12 +41,14 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
     {
         try
         {
-            var data = await _dbSet.Where(filter).ToListAsync();
+            var data = await _dbSet
+                .AsNoTracking()
+                .Where(filter)
+                .ToListAsync();
 
-            if (data.Count == 0)
-                return TResultFactory.Empty<List<T>>("No matching entities found.");
-
-            return TResultFactory.Ok(data, "Filtered entities retrieved.");
+            return data.Count == 0
+                ? TResultFactory.NoContent<List<T>>("No matching entities found.")
+                : TResultFactory.Ok(data, "Filtered entities retrieved successfully.");
         }
         catch (Exception ex)
         {
@@ -51,17 +58,18 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
 
     public async Task<TResult<T>> GetAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            return TResultFactory.BadRequest<T>("Id cannot be empty.");
+
         try
         {
-            if (id == Guid.Empty)
-                return TResultFactory.BadRequest<T>("Id cannot be empty.");
+            var entity = await _dbSet
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
-
-            if (entity != null)
-                return TResultFactory.Ok(entity, "Entity found.");
-            else
-                return TResultFactory.NotFound<T>($"Entity with Id {id} not found.");
+            return entity is null
+                ? TResultFactory.NotFound<T>($"Entity with Id {id} not found.")
+                : TResultFactory.Ok(entity, "Entity found.");
         }
         catch (Exception ex)
         {
@@ -73,12 +81,13 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
     {
         try
         {
-            var entity = await _dbSet.FirstOrDefaultAsync(filter);
+            var entity = await _dbSet
+                .AsNoTracking()
+                .FirstOrDefaultAsync(filter);
 
-            if (entity != null)
-                return TResultFactory.Ok(entity, "Entity found.");
-            else
-                return TResultFactory.NotFound<T>("No matching entity found.");
+            return entity is null
+                ? TResultFactory.NotFound<T>("No matching entity found.")
+                : TResultFactory.Ok(entity, "Entity found.");
         }
         catch (Exception ex)
         {
@@ -86,60 +95,74 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         }
     }
 
-    // ---- COMMANDS: Data is left unset ----
-    public async Task<TResult<T>> ApplyChangesAsync(T entity)
+    // ------------------------
+    // COMMANDS
+    // ------------------------
+
+    public async Task<TResult> CreateAsync(T entity)
     {
+        if (entity is null)
+            return TResultFactory.BadRequest("Entity cannot be null.");
+
         try
         {
-            if (entity is null)
-                return TResultFactory.BadRequest<T>("Entity cannot be null.");
-
-            if (entity is not IListEditEntity editable)
-                return TResultFactory.BadRequest<T>($"Entity of type {typeof(T).Name} must implement IListEditEntity to use ApplyChangesAsync.");
-
-            if (editable.IsNew)
-            {
-                await _dbSet.AddAsync(entity);
-            }
-            else
-            {
-                var existing = await _dbSet.FirstOrDefaultAsync(x => x.Id == entity.Id);
-                if (existing is null)
-                    return TResultFactory.NotFound<T>($"Entity with Id {entity.Id} not found.");
-
-                _context.Entry(existing).CurrentValues.SetValues(entity);
-            }
-
+            await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
 
-            return TResultFactory.Ok(entity, "Changes saved successfully.");
+            return TResultFactory.Created("Entity created successfully.");
         }
         catch (Exception ex)
         {
-            return TResultFactory.Error<T>(ex.Message);
+            return TResultFactory.Error(ex.Message);
         }
     }
 
-    public async Task<TResult<T>> DeleteAsync(Guid id)
+    public async Task<TResult> UpdateAsync(T entity)
     {
+        if (entity is null)
+            return TResultFactory.BadRequest("Entity cannot be null.");
+
+        if (entity.Id == Guid.Empty)
+            return TResultFactory.BadRequest("Entity Id cannot be empty.");
+
         try
         {
-            if (id == Guid.Empty)
-                return TResultFactory.BadRequest<T>("Id cannot be empty.");
+            var existing = await _dbSet.FirstOrDefaultAsync(x => x.Id == entity.Id);
 
+            if (existing is null)
+                return TResultFactory.NotFound($"Entity with Id {entity.Id} not found.");
+
+            _context.Entry(existing).CurrentValues.SetValues(entity);
+            await _context.SaveChangesAsync();
+
+            return TResultFactory.Ok("Entity updated successfully.");
+        }
+        catch (Exception ex)
+        {
+            return TResultFactory.Error(ex.Message);
+        }
+    }
+
+    public async Task<TResult> DeleteAsync(Guid id)
+    {
+        if (id == Guid.Empty)
+            return TResultFactory.BadRequest("Id cannot be empty.");
+
+        try
+        {
             var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
 
             if (entity is null)
-                return TResultFactory.NotFound<T>($"Entity with Id {id} not found.");
+                return TResultFactory.NotFound($"Entity with Id {id} not found.");
 
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
 
-            return TResultFactory.Ok(entity, "Entity deleted successfully.");
+            return TResultFactory.Ok("Entity deleted successfully.");
         }
         catch (Exception ex)
         {
-            return TResultFactory.Error<T>(ex.Message);
+            return TResultFactory.Error(ex.Message);
         }
     }
 }
