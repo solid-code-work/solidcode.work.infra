@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -28,26 +26,47 @@ public sealed class JwtTokenHelper
 
     /// <summary>
     /// Generates a signed JWT access token.
+    /// Matches CurrentUser: UserId, UserName, Email, Role
     /// </summary>
     public string GenerateToken(
-        string userId,
+        Guid userId,
         string userName,
+        string email,
         IEnumerable<string> roles,
         IDictionary<string, string>? additionalClaims = null)
     {
-        if (string.IsNullOrWhiteSpace(userId))
+        if (userId == Guid.Empty)
             throw new ArgumentException("userId is required.", nameof(userId));
 
         if (string.IsNullOrWhiteSpace(userName))
             throw new ArgumentException("userName is required.", nameof(userName));
 
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("email is required.", nameof(email));
+
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, userId),
-            new Claim(ClaimTypes.Name, userName)
+            // -----------------------------
+            // Required for CurrentUser
+            // -----------------------------
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(ClaimTypes.Name, userName),
+            new Claim(ClaimTypes.Email, email),
+
+            // -----------------------------
+            // JWT Standard Claims
+            // -----------------------------
+            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(
+                JwtRegisteredClaimNames.Iat,
+                DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+                ClaimValueTypes.Integer64)
         };
 
-        // Roles (safe against null / empty)
+        // -----------------------------
+        // Roles
+        // -----------------------------
         if (roles != null)
         {
             foreach (var role in roles)
@@ -59,7 +78,9 @@ public sealed class JwtTokenHelper
             }
         }
 
-        // Additional custom claims
+        // -----------------------------
+        // Additional Custom Claims
+        // -----------------------------
         if (additionalClaims != null)
         {
             foreach (var claim in additionalClaims)
@@ -77,7 +98,7 @@ public sealed class JwtTokenHelper
             SecurityAlgorithms.HmacSha256);
 
         // ⚠️ IMPORTANT:
-        // DO NOT set `notBefore` (nbf) – causes clock-related 401 errors
+        // Do NOT set notBefore (nbf) – avoids clock skew issues
         var token = new JwtSecurityToken(
             issuer: _settings.Issuer,
             audience: _settings.Audience,

@@ -4,9 +4,9 @@ using Microsoft.OpenApi.Models;
 
 namespace solidcode.work.infra.Swagger;
 
-public static class SwaggerExtensions
+public static class SolidCodeSwagger
 {
-    public static IServiceCollection AddSwaggerWithJwt(
+    public static IServiceCollection AddSolidCodeSwagger(
         this IServiceCollection services,
         string title = "API",
         string version = "v1")

@@ -16,7 +16,9 @@ public static class Extension
         services.AddDbContext<TContext>((serviceProvider, options) =>
         {
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            var sqlSettings = configuration.GetSection(nameof(MSSQLsettings)).Get<MSSQLsettings>();
+            var sqlSettings = configuration
+                .GetSection(nameof(MSSQLsettings))
+                .Get<MSSQLsettings>();
 
             if (string.IsNullOrWhiteSpace(sqlSettings?.ConnectionString))
                 throw new ArgumentException("SQL Server connection string is missing or invalid.");
@@ -24,20 +26,23 @@ public static class Extension
             options.UseSqlServer(sqlSettings.ConnectionString);
         });
 
+        // 🔴 THIS IS THE IMPORTANT LINE
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<TContext>());
+
         return services;
     }
 
 
-    public static IServiceCollection AddEfRepository<T>(this IServiceCollection services)
-    where T : class, IEntity
+    public static IServiceCollection AddEfRepository<T, TContext>(this IServiceCollection services)
+        where T : class, IEntity
+        where TContext : DbContext
     {
         services.AddScoped<IRepository<T>>(sp =>
         {
-            var dbContext = sp.GetRequiredService<DbContext>();
+            var dbContext = sp.GetRequiredService<TContext>();
             return new EfRepository<T>(dbContext);
         });
 
         return services;
     }
-
 }

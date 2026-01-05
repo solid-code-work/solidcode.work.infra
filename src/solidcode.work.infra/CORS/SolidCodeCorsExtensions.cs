@@ -6,7 +6,7 @@ using solidcode.work.infra.Configurations;
 
 namespace solidcode.work.infra.CORS;
 
-public static class CorsExtensions
+public static class SolidCodeCorsExtensions
 {
     //appsetting.js
     //  {
@@ -21,13 +21,13 @@ public static class CorsExtensions
     //
 
 
-    public static IServiceCollection AddCommonCors(this IServiceCollection services)
+    public static IServiceCollection AddSolidcodeCors(this IServiceCollection services)
     {
         services.AddCors(); // You can defer adding the policy until runtime
         return services;
     }
 
-    public static IApplicationBuilder UseCommonCors(this IApplicationBuilder app)
+    public static IApplicationBuilder UseSolideCodeCors(this IApplicationBuilder app)
     {
         var configuration = app.ApplicationServices.GetRequiredService<IConfiguration>();
         var corsOptions = configuration.GetSection("Cors").Get<CorsConfiguration>();

@@ -8,7 +8,7 @@
     <AssemblyName>solidcode.work.infra</AssemblyName>
     <RootNamespace>solidcode.work.infra</RootNamespace>
     <PackageId>solidcode.work.infra</PackageId>
-    <Version>1.3.8</Version>
+    <Version>1.6.2</Version>
     <IsPackable>true</IsPackable>
     <Authors>Shahram Etemadi</Authors>
     <Company>solidcode.work</Company>
@@ -33,6 +33,7 @@
 <!-- ========================= -->
 <ItemGroup>
   <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+  <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
 </ItemGroup>
 
 <ItemGroup>

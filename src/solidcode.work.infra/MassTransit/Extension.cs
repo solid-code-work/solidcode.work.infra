@@ -2,21 +2,31 @@ using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Configurations;
 
 namespace solidcode.work.infra.MassTransit;
 
 public static class Extension
 {
-    public static IServiceCollection AddMassTransitWithRabbitMq(this IServiceCollection services)
+    public static IServiceCollection AdSolidCodeMassTransitWithRabbitMq(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Action<IRegistrationConfigurator>? configureConsumers = null)
     {
         services.AddMassTransit(x =>
         {
-            x.AddConsumers(Assembly.GetEntryAssembly());
+            // If caller provided consumers, register them
+            configureConsumers?.Invoke(x);
+
+            // Otherwise, fall back to scanning the entry assembly
+            if (configureConsumers == null)
+            {
+                x.AddConsumers(Assembly.GetEntryAssembly());
+            }
 
             x.UsingRabbitMq((serviceProvider, options) =>
             {
-                var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                 var rabbitMqSettings = configuration.GetSection(nameof(RabbitMqSettings)).Get<RabbitMqSettings>();
                 var serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
 
@@ -28,7 +38,9 @@ public static class Extension
 
                 options.Host(rabbitMqSettings.Host);
 
-                options.ConfigureEndpoints(serviceProvider, new KebabCaseEndpointNameFormatter(serviceSettings.ServiceName, false));
+                options.ConfigureEndpoints(
+                    serviceProvider,
+                    new KebabCaseEndpointNameFormatter(serviceSettings.ServiceName, false));
 
                 options.UseMessageRetry(retry =>
                 {
@@ -37,7 +49,7 @@ public static class Extension
             });
         });
 
+        services.AddScoped<IMessageProducer, MassTransitHelpercs>();
         return services;
     }
-
 }

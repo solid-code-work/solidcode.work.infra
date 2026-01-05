@@ -4,14 +4,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Configurations;
 using solidcode.work.infra.security;
 
 namespace solidcode.work.infra.Extensions;
 
-public static class JwtAuthenticationExtension
+public static class SolidCodeAuthentication
 {
-    public static IServiceCollection AddJwtAuthentication(
+    public static IServiceCollection AddSolidCodeAuthentication(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -153,7 +154,9 @@ public static class JwtAuthenticationExtension
 
         services.AddAuthorization();
         services.AddScoped<JwtTokenHelper>();
-
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<IPasswordHashService, PasswordHashService>();
         Console.WriteLine("✅ JWT Authentication registered");
 
         return services;
