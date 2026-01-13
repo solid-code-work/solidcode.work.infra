@@ -8,9 +8,9 @@ using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Configurations;
 using solidcode.work.infra.security;
 
-namespace solidcode.work.infra.Extensions;
+namespace solidcode.work.infra;
 
-public static class SolidCodeAuthentication
+public static class SolidCodeAuthenticationExtension
 {
     public static IServiceCollection AddSolidCodeAuthentication(
         this IServiceCollection services,

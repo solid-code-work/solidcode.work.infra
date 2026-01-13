@@ -4,22 +4,21 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Configurations;
 using solidcode.work.infra.Entities;
-using solidcode.work.infra.Repositories;
 
 namespace solidcode.work.infra.Mongo;
 
 public static class Extensions
 {
-    public static IServiceCollection AddMongoDB(this IServiceCollection services)
+    public static IServiceCollection AddSolidCodeMongoDB(this IServiceCollection services, IConfiguration configuration)
     {
         BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
         BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
 
         services.AddSingleton<IMongoDatabase>(sp =>
         {
-            var configuration = sp.GetRequiredService<IConfiguration>();
 
             var serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
             var mongoSettings = configuration.GetSection(nameof(MongoDBsettings)).Get<MongoDBsettings>();
@@ -37,7 +36,7 @@ public static class Extensions
         return services;
     }
 
-    public static IServiceCollection AddMongoRepository<T>(this IServiceCollection services, string collectionName) where T : class, IEntity, new()
+    public static IServiceCollection AddSolidCodeMongoRepository<T>(this IServiceCollection services, string collectionName) where T : class, IEntity, new()
     {
         services.AddScoped<IRepository<T>>(x =>
         {

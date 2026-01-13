@@ -3,17 +3,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using solidcode.work.infra.Configurations;
 
-namespace solidcode.work.infra.PostgreSQL;
+namespace solidcode.work.infra;
 
-public static class Extension
+public static class PostgreSQLExtension
 {
     public static IServiceCollection AddPostgresDbContext<TContext>(
-    this IServiceCollection services)
+    this IServiceCollection services, IConfiguration configuration)
     where TContext : DbContext
     {
         services.AddDbContext<TContext>((serviceProvider, options) =>
         {
-            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var postgresSettings = configuration.GetSection(nameof(PostgreSQLSettings)).Get<PostgreSQLSettings>();
 
             if (string.IsNullOrWhiteSpace(postgresSettings?.ConnectionString))

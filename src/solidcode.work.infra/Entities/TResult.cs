@@ -13,3 +13,4 @@ public class TResult<T> : TResult
     public T? Data { get; init; }
 }
 
+

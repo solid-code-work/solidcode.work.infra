@@ -1,4 +1,4 @@
-namespace solidcode.work.infra.Redis;
+namespace solidcode.work.infra.Abstraction;
 
 public interface ICacheService
 {

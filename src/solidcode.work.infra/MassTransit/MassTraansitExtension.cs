@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Configurations;
 
-namespace solidcode.work.infra.MassTransit;
+namespace solidcode.work.infra;
 
 public static class Extension
 {

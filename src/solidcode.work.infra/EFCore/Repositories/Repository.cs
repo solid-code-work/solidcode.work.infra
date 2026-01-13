@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Entities;
 using System.Linq.Expressions;
 
@@ -16,7 +17,8 @@ public class Repository<T> : IRepository<T>
         _set = db.Set<T>();
     }
 
-    public async Task<TResult<T>> GetAsync(Expression<Func<T, bool>> filter)
+    public async Task<TResult<T>> GetAsync(Expression<Func<T, bool>> filter,
+    Func<IQueryable<T>, IQueryable<T>>? include = null)
     {
         try
         {
@@ -34,7 +36,7 @@ public class Repository<T> : IRepository<T>
         }
     }
 
-    public async Task<TResult<T>> GetAsync(Guid id)
+    public async Task<TResult<T>> GetAsync(Guid id, Func<IQueryable<T>, IQueryable<T>>? include = null)
     {
         try
         {
@@ -109,6 +111,33 @@ public class Repository<T> : IRepository<T>
         catch (Exception ex)
         {
             return TResultFactory.Error(ex.Message);
+        }
+    }
+    public async Task<TResult<T>> CreateAndReturnAsync(T entity)
+    {
+        try
+        {
+            _set.Add(entity);
+            await _db.SaveChangesAsync();
+            return TResultFactory.Ok(entity);
+        }
+        catch (Exception ex)
+        {
+            return TResultFactory.Error<T>(ex.Message);
+        }
+    }
+
+    public async Task<TResult<T>> UpdateAndReturnAsync(T entity)
+    {
+        try
+        {
+            _set.Update(entity);
+            await _db.SaveChangesAsync();
+            return TResultFactory.Ok(entity);
+        }
+        catch (Exception ex)
+        {
+            return TResultFactory.Error<T>(ex.Message);
         }
     }
 

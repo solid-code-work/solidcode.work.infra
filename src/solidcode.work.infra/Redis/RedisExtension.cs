@@ -1,10 +1,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Configurations;
 
-namespace solidcode.work.infra.Redis;
+namespace solidcode.work.infra;
 
-public static class Extension
+public static class RedisExtension
 {
     public static IServiceCollection AddRedisCacheService(this IServiceCollection services)
     {

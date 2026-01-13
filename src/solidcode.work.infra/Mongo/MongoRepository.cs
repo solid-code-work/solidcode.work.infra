@@ -1,8 +1,9 @@
 using System.Linq.Expressions;
 using MongoDB.Driver;
+using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Entities;
 
-namespace solidcode.work.infra.Repositories;
+namespace solidcode.work.infra;
 
 public class MongoRepository<T> : IRepository<T> where T : class, IEntity
 {
@@ -54,7 +55,7 @@ public class MongoRepository<T> : IRepository<T> where T : class, IEntity
         }
     }
 
-    public async Task<TResult<T>> GetAsync(Guid id)
+    public async Task<TResult<T>> GetAsync(Guid id, Func<IQueryable<T>, IQueryable<T>>? include = null)
     {
         if (id == Guid.Empty)
             return TResultFactory.BadRequest<T>("Id cannot be empty.");
@@ -75,7 +76,7 @@ public class MongoRepository<T> : IRepository<T> where T : class, IEntity
         }
     }
 
-    public async Task<TResult<T>> GetAsync(Expression<Func<T, bool>> filter)
+    public async Task<TResult<T>> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IQueryable<T>>? include = null)
     {
         try
         {
@@ -134,6 +135,45 @@ public class MongoRepository<T> : IRepository<T> where T : class, IEntity
         catch (Exception ex)
         {
             return TResultFactory.Error(ex.Message);
+        }
+    }
+    public async Task<TResult<T>> CreateAndReturnAsync(T entity)
+    {
+        if (entity is null)
+            return TResultFactory.BadRequest<T>("Entity cannot be null.");
+
+        try
+        {
+            await _collection.InsertOneAsync(entity);
+            return TResultFactory.Created(entity, "Entity created successfully.");
+        }
+        catch (Exception ex)
+        {
+            return TResultFactory.Error<T>(ex.Message);
+        }
+    }
+
+    public async Task<TResult<T>> UpdateAndReturnAsync(T entity)
+    {
+        if (entity is null)
+            return TResultFactory.BadRequest<T>("Entity cannot be null.");
+
+        if (entity.Id == Guid.Empty)
+            return TResultFactory.BadRequest<T>("Entity Id cannot be empty.");
+
+        try
+        {
+            var result = await _collection.ReplaceOneAsync(
+                _filter.Eq(x => x.Id, entity.Id),
+                entity);
+
+            return result.MatchedCount == 0
+                ? TResultFactory.NotFound<T>($"Entity with Id {entity.Id} not found.")
+                : TResultFactory.Ok(entity, "Entity updated successfully.");
+        }
+        catch (Exception ex)
+        {
+            return TResultFactory.Error<T>(ex.Message);
         }
     }
 

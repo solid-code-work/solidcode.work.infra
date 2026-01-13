@@ -1,7 +1,8 @@
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
+using solidcode.work.infra.Abstraction;
 
-namespace solidcode.work.infra.Redis;
+namespace solidcode.work.infra;
 
 public class RedisCacheService : ICacheService
 {

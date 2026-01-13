@@ -4,10 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using solidcode.work.infra.Entities;
 using solidcode.work.infra.Repositories;
 using solidcode.work.infra.Configurations;
+using solidcode.work.infra.Abstraction;
 
-namespace solidcode.work.infra.MSSQL;
+namespace solidcode.work.infra;
 
-public static class Extension
+public static class MSSQLExtension
 {
     public static IServiceCollection AddSqlServerDbContext<TContext>(
     this IServiceCollection services)

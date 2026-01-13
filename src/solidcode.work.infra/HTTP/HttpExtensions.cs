@@ -2,19 +2,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using solidcode.work.infra.Cofigurations;
 using solidcode.work.infra.Configurations;
-using solidcode.work.infra.Helpers;
 using Polly;
 
-namespace solidcode.work.infra.HTTPClient;
+namespace solidcode.work.infra;
 
-public static class Extensions
+public static class HttpExtensions
 {
-    public static IServiceCollection AddHttpClient(this IServiceCollection services)
+    public static IServiceCollection AddSolidCodeHttpClient(this IServiceCollection services, IConfiguration configuration)
     {
-        // Build a temporary provider to resolve IConfiguration
-        using var scope = services.BuildServiceProvider();
-        var configuration = scope.GetRequiredService<IConfiguration>();
-
         var httpClientSettings = configuration
             .GetSection("HttpClientSetting")
             .Get<HTTPClientSetting>() ??

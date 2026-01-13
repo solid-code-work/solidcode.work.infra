@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace solidcode.work.infra.Web.ReverseProxy;
+namespace solidcode.work.infra;
 
-public static class ReverseProxyServiceCollectionExtensions
+public static class ReverseProxyExtensions
 {
     public static IServiceCollection AddSolidCodeReverseProxy(
         this IServiceCollection services,
