@@ -5,7 +5,22 @@ using solidcode.work.infra.Entities;
 
 namespace solidcode.work.infra;
 
-public class MongoRepository<T> : IRepository<T> where T : class, IEntity
+public interface IMongoRepository<T> where T : class, IEntity
+{
+    Task<TResult<T>> CreateAndReturnAsync(T entity);
+    Task<TResult> CreateAsync(T entity);
+    Task<TResult> DeleteAsync(Guid id);
+    Task<TResult<List<T>>> GetAllAsync();
+    Task<TResult<List<T>>> GetAllAsync(Expression<Func<T, bool>> filter);
+    Task<TResult<T>> GetAsync(Guid id, Func<IQueryable<T>, IQueryable<T>>? include = null);
+    Task<TResult<T>> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IQueryable<T>>? include = null);
+    Task<TResult> SaveChangesAsync(T entity);
+    Task<TResult<T>> UpdateAndReturnAsync(T entity);
+    Task<TResult> UpdateAsync(T entity);
+}
+
+public class MongoRepository<T> : IMongoRepository<T>
+where T : class, IEntity
 {
     private readonly IMongoCollection<T> _collection;
     private readonly FilterDefinitionBuilder<T> _filter = Builders<T>.Filter;
@@ -190,6 +205,19 @@ public class MongoRepository<T> : IRepository<T> where T : class, IEntity
             return result.DeletedCount == 0
                 ? TResultFactory.NotFound($"Entity with Id {id} not found.")
                 : TResultFactory.Ok("Entity deleted successfully.");
+        }
+        catch (Exception ex)
+        {
+            return TResultFactory.Error(ex.Message);
+        }
+    }
+
+    public async Task<TResult> SaveChangesAsync(T entity)
+    {
+        try
+        {
+            //await _db.SaveChangesAsync();
+            return TResultFactory.Ok();
         }
         catch (Exception ex)
         {

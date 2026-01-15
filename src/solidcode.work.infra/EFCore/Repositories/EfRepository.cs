@@ -38,18 +38,18 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         }
     }
 
-    public async Task<TResult<List<T>>> GetAllAsync(Expression<Func<T, bool>> filter)
+    public async Task<TResult<List<T>>> GetAllAsync(
+    Func<IQueryable<T>, IQueryable<T>> queryBuilder)
     {
         try
         {
-            var data = await _dbSet
-                .AsNoTracking()
-                .Where(filter)
-                .ToListAsync();
+            IQueryable<T> query = _dbSet.AsNoTracking();
 
-            return data.Count == 0
-                ? TResultFactory.NoContent<List<T>>("No matching entities found.")
-                : TResultFactory.Ok(data, "Filtered entities retrieved successfully.");
+            query = queryBuilder(query);
+
+            var list = await query.ToListAsync();
+
+            return TResultFactory.Ok(list);
         }
         catch (Exception ex)
         {
@@ -67,7 +67,7 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         try
         {
             // Start query
-            IQueryable<T> query = _dbSet.AsNoTracking();
+            IQueryable<T> query = _dbSet;
 
             // Apply includes if provided
             if (include != null)
@@ -94,7 +94,7 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
     {
         try
         {
-            IQueryable<T> query = _dbSet.AsNoTracking();
+            IQueryable<T> query = _dbSet;
 
             if (include != null)
                 query = include(query);
@@ -150,8 +150,7 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
 
             if (existing is null)
                 return TResultFactory.NotFound($"Entity with Id {entity.Id} not found.");
-
-            _context.Entry(existing).CurrentValues.SetValues(entity);
+            ;
             await _context.SaveChangesAsync();
 
             return TResultFactory.Ok("Entity updated successfully.");
@@ -198,8 +197,6 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
 
             if (existing is null)
                 return TResultFactory.NotFound<T>($"Entity with Id {entity.Id} not found.");
-
-            _context.Entry(existing).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
 
             return TResultFactory.Ok(existing, "Entity updated successfully.");
@@ -233,6 +230,28 @@ public class EfRepository<T> : IRepository<T> where T : class, IEntity
         }
         catch (Exception ex)
         {
+            return TResultFactory.Error(ex.Message);
+        }
+    }
+
+    public async Task<TResult> SaveChangesAsync(T entity)
+    {
+        try
+        {
+            foreach (var e in _context.ChangeTracker.Entries())
+            {
+                Console.WriteLine($"{e.Entity.GetType().Name} => {e.State}");
+            }
+            await _context.SaveChangesAsync();
+            return TResultFactory.Ok();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                Console.WriteLine($"Concurrency on: {entry.Entity.GetType().Name}");
+                Console.WriteLine($"State: {entry.State}");
+            }
             return TResultFactory.Error(ex.Message);
         }
     }

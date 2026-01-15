@@ -38,7 +38,7 @@ public static class Extensions
 
     public static IServiceCollection AddSolidCodeMongoRepository<T>(this IServiceCollection services, string collectionName) where T : class, IEntity, new()
     {
-        services.AddScoped<IRepository<T>>(x =>
+        services.AddScoped<IMongoRepository<T>>(x =>
         {
             var database = x.GetRequiredService<IMongoDatabase>();
             return new MongoRepository<T>(database, collectionName);
