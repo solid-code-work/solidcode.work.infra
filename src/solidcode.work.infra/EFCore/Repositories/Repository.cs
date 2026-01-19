@@ -212,4 +212,14 @@ where T : class, IEntity
             return TResultFactory.Error(ex.Message);
         }
     }
+    public IQueryable<T> Query()
+    {
+        return _dbSet.AsNoTracking();
+    }
+
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+    {
+        return await _dbSet.AnyAsync(predicate);
+    }
+
 }

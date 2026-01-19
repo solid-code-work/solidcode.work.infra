@@ -1,4 +1,4 @@
-namespace solidcode.work.infra.Cofigurations;
+namespace solidcode.work.infra.Configurations;
 
 public class HTTPClientSetting
 {

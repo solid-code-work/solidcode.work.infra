@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using solidcode.work.infra.Cofigurations;
+using solidcode.work.infra.Configurations;
 using solidcode.work.infra.Configurations;
 using Polly;
 

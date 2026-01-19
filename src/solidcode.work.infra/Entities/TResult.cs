@@ -1,4 +1,5 @@
-﻿namespace solidcode.work.infra.Entities;
+﻿using System;
+namespace solidcode.work.infra.Entities;
 
 public class TResult
 {

@@ -15,6 +15,10 @@ public interface IRepository<T> where T : class, IEntity
     Task<TResult<T>> UpdateAndReturnAsync(T entity);
     Task<TResult> DeleteAsync(Guid id);
     Task<TResult> SaveChangesAsync(T entity);
+    IQueryable<T> Query();
+    Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
+
+
 }
 
 
