@@ -35,7 +35,7 @@ This library is the backbone of my portfolio and reflects my approach to buildin
 - **Repositories**
   - Generic repository pattern for EF Core and MongoDB
 - **Unified Responses**
-  - `TResult<T>` and `TResultFactory` for consistent success/failure handling
+  - `TResponse<T>` and `TResponseFactory` for consistent success/failure handling
   - `MessageErrorType` enum for standardized error classification
 - **Logging**
   - Built‑in `ILogger<T>` integration via `AddSolidcodeLogging()`

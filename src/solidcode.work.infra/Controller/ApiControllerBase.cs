@@ -10,7 +10,7 @@ public abstract class ApiControllerBase : ControllerBase
     // ----------------------------------------
     // Non-generic results (Delete, commands)
     // ----------------------------------------
-    protected IActionResult FromResult(TResult result)
+    protected IActionResult FromResult(TResponse result)
     {
         if (result.IsSuccess)
         {
@@ -31,7 +31,7 @@ public abstract class ApiControllerBase : ControllerBase
     // ----------------------------------------
     // Generic results (Queries)
     // ----------------------------------------
-    protected IActionResult FromResult<T>(TResult<T> result)
+    protected IActionResult FromResult<T>(TResponse<T> result)
     {
         if (result.IsSuccess)
         {

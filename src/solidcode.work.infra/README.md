@@ -7,7 +7,7 @@ It provides ready-to-use building blocks for:
 - **Caching**: Redis
 - **Messaging**: MassTransit + RabbitMQ
 - **Resilience**: Polly-based HTTP client helpers
-- **Unified responses**: `TResult<T>` and `MessageErrorType`
+- **Unified responses**: `TResponse<T>` and `MessageErrorType`
 - **Logging**: Built-in `ILogger<T>` integration with optional Serilog extension
 - **Authentication**
   - JWT bearer authentication with issuer, audience, and secret key validation

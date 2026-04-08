@@ -1,7 +1,8 @@
 using System.Text.Json.Serialization;
 using System.Globalization;
 using System.Text.Json;
-namespace SolidCode.Work.Infra.Serialization;
+namespace solidcode.work.infra.Serialization;
+
 public sealed class DateTimeJsonConverter : JsonConverter<DateTime>
 {
     private const string Format = "yyyy-MM-ddTHH:mm:ss";

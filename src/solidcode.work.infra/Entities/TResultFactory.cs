@@ -1,12 +1,12 @@
 namespace solidcode.work.infra.Entities;
 
-public static class TResultFactory
+public static class TResponseFactory
 {
     // ========================
     // SUCCESS
     // ========================
 
-    public static TResult Ok(string? message = null) =>
+    public static TResponse Ok(string? message = null) =>
         new()
         {
             IsSuccess = true,
@@ -14,7 +14,7 @@ public static class TResultFactory
             Message = message
         };
 
-    public static TResult<T> Ok<T>(T data, string? message = null) =>
+    public static TResponse<T> Ok<T>(T data, string? message = null) =>
         new()
         {
             IsSuccess = true,
@@ -23,7 +23,7 @@ public static class TResultFactory
             Message = message
         };
 
-    public static TResult Created(string? message = null) =>
+    public static TResponse Created(string? message = null) =>
         new()
         {
             IsSuccess = true,
@@ -31,7 +31,7 @@ public static class TResultFactory
             Message = message
         };
 
-    public static TResult<T> Created<T>(T data, string? message = null) =>
+    public static TResponse<T> Created<T>(T data, string? message = null) =>
         new()
         {
             IsSuccess = true,
@@ -40,7 +40,7 @@ public static class TResultFactory
             Message = message
         };
 
-    public static TResult NoContent(string? message = null) =>
+    public static TResponse NoContent(string? message = null) =>
         new()
         {
             IsSuccess = true,
@@ -48,7 +48,7 @@ public static class TResultFactory
             Message = message
         };
 
-    public static TResult<T> NoContent<T>(string? message = null) =>
+    public static TResponse<T> NoContent<T>(string? message = null) =>
         new()
         {
             IsSuccess = true,
@@ -61,7 +61,7 @@ public static class TResultFactory
     // CLIENT ERRORS
     // ========================
 
-    public static TResult BadRequest(string message) =>
+    public static TResponse BadRequest(string message) =>
         new()
         {
             IsSuccess = false,
@@ -69,7 +69,7 @@ public static class TResultFactory
             Message = message
         };
 
-    public static TResult<T> BadRequest<T>(string message) =>
+    public static TResponse<T> BadRequest<T>(string message) =>
         new()
         {
             IsSuccess = false,
@@ -77,7 +77,7 @@ public static class TResultFactory
             Message = message
         };
 
-    public static TResult NotFound(string message) =>
+    public static TResponse NotFound(string message) =>
         new()
         {
             IsSuccess = false,
@@ -85,7 +85,7 @@ public static class TResultFactory
             Message = message
         };
 
-    public static TResult<T> NotFound<T>(string message) =>
+    public static TResponse<T> NotFound<T>(string message) =>
         new()
         {
             IsSuccess = false,
@@ -97,7 +97,7 @@ public static class TResultFactory
     // SERVER ERROR
     // ========================
 
-    public static TResult Error(string message) =>
+    public static TResponse Error(string message) =>
         new()
         {
             IsSuccess = false,
@@ -105,7 +105,7 @@ public static class TResultFactory
             Message = message
         };
 
-    public static TResult<T> Error<T>(string message) =>
+    public static TResponse<T> Error<T>(string message) =>
         new()
         {
             IsSuccess = false,
