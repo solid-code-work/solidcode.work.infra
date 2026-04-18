@@ -12,11 +12,11 @@ public sealed class MassTransitHelpercs : IMessageProducer
         _publishEndpoint = publishEndpoint;
     }
 
-    public Task PublishAsync<TMessage>(TMessage message)
+    public Task PublishAsync<TMessage>(TMessage message, CancellationToken ct = default)
         where TMessage : class
     {
 
         Console.WriteLine($"📤 Publishing message of type {typeof(TMessage).Name}");
-        return _publishEndpoint.Publish(message);
+        return _publishEndpoint.Publish(message, ct);
     }
 }

@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Entities;
 using System.Linq.Expressions;
 
-namespace solidcode.work.infra.Repositories;
+
 
 public class ReadRepository<T> : IReadRepository<T>
 where T : class, IEntity
@@ -14,13 +13,13 @@ where T : class, IEntity
         _dbSet = context.Set<T>();
     }
 
-    public async Task<TResponse<List<T>>> GetAllAsync()
+    public async Task<TResponse<List<T>>> GetAllAsync(CancellationToken ct = default)
     {
         try
         {
             var data = await _dbSet
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(ct);
 
             return data.Count == 0
                 ? TResponseFactory.NoContent<List<T>>("No entities found.")
@@ -32,7 +31,7 @@ where T : class, IEntity
         }
     }
 
-    public async Task<TResponse<List<T>>> GetAllAsync(Func<IQueryable<T>, IQueryable<T>> queryBuilder)
+    public async Task<TResponse<List<T>>> GetAllAsync(Func<IQueryable<T>, IQueryable<T>> queryBuilder, CancellationToken ct = default)
     {
         try
         {
@@ -40,7 +39,7 @@ where T : class, IEntity
 
             query = queryBuilder(query);
 
-            var list = await query.ToListAsync();
+            var list = await query.ToListAsync(ct);
 
             return list.Count == 0
                 ? TResponseFactory.NoContent<List<T>>("No entities found.")
@@ -52,7 +51,7 @@ where T : class, IEntity
         }
     }
 
-    public async Task<TResponse<T>> GetAsync(Guid id, Func<IQueryable<T>, IQueryable<T>>? include = null)
+    public async Task<TResponse<T>> GetAsync(Guid id, Func<IQueryable<T>, IQueryable<T>>? include = null, CancellationToken ct = default)
     {
         if (id == Guid.Empty)
             return TResponseFactory.BadRequest<T>("Id cannot be empty.");
@@ -64,7 +63,7 @@ where T : class, IEntity
             if (include != null)
                 query = include(query);
 
-            var entity = await query.FirstOrDefaultAsync(x => x.Id == id);
+            var entity = await query.FirstOrDefaultAsync(x => x.Id == id, ct);
 
             return entity is null
                 ? TResponseFactory.NotFound<T>($"Entity with Id {id} not found.")
@@ -76,7 +75,7 @@ where T : class, IEntity
         }
     }
 
-    public async Task<TResponse<T>> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IQueryable<T>>? include = null)
+    public async Task<TResponse<T>> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IQueryable<T>>? include = null, CancellationToken ct = default)
     {
         try
         {
@@ -85,7 +84,7 @@ where T : class, IEntity
             if (include != null)
                 query = include(query);
 
-            var entity = await query.FirstOrDefaultAsync(filter);
+            var entity = await query.FirstOrDefaultAsync(filter, ct);
 
             return entity is null
                 ? TResponseFactory.NotFound<T>("No matching entity found.")
@@ -103,8 +102,8 @@ where T : class, IEntity
         return _dbSet.AsNoTracking();
     }
 
-    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
     {
-        return await _dbSet.AnyAsync(predicate);
+        return await _dbSet.AnyAsync(predicate, ct);
     }
 }

@@ -14,14 +14,14 @@ where T : class, IEntity
         _dbSet = context.Set<T>();
     }
 
-    public async Task<TResponse> CreateAsync(T entity)
+    public async Task<TResponse> CreateAsync(T entity, CancellationToken ct = default)
     {
         if (entity is null)
             return TResponseFactory.BadRequest("Entity cannot be null.");
 
         try
         {
-            await _dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(entity, ct);
 
             return TResponseFactory.Created("Entity added to context.");
         }
@@ -31,7 +31,7 @@ where T : class, IEntity
         }
     }
 
-    public Task<TResponse> UpdateAsync(T entity)
+    public Task<TResponse> UpdateAsync(T entity, CancellationToken ct = default)
     {
         if (entity is null)
             return Task.FromResult(TResponseFactory.BadRequest("Entity cannot be null."));
@@ -51,14 +51,14 @@ where T : class, IEntity
         }
     }
 
-    public async Task<TResponse> DeleteAsync(Guid id)
+    public async Task<TResponse> DeleteAsync(Guid id, CancellationToken ct = default)
     {
         if (id == Guid.Empty)
             return TResponseFactory.BadRequest("Id cannot be empty.");
 
         try
         {
-            var entity = await _dbSet.FindAsync(id);
+            var entity = await _dbSet.FindAsync(id, ct);
 
             if (entity is null)
                 return TResponseFactory.NotFound($"Entity with Id {id} not found.");
@@ -72,47 +72,4 @@ where T : class, IEntity
             return TResponseFactory.Error(ex.Message);
         }
     }
-
-
-
-
-
-    // public async Task<TResponse<T>> CreateAndReturnAsync(T entity)
-    // {
-    //     if (entity is null)
-    //         return TResponseFactory.BadRequest<T>("Entity cannot be null.");
-
-    //     try
-    //     {
-    //         await _dbSet.AddAsync(entity);
-
-    //         return TResponseFactory.Created(entity);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return TResponseFactory.Error<T>(ex.Message);
-    //     }
-    // }
-
-    // public Task<TResponse<T>> UpdateAndReturnAsync(T entity)
-    // {
-    //     if (entity is null)
-    //         return Task.FromResult(TResponseFactory.BadRequest<T>("Entity cannot be null."));
-
-    //     if (entity.Id == Guid.Empty)
-    //         return Task.FromResult(TResponseFactory.BadRequest<T>("Entity Id cannot be empty."));
-
-    //     try
-    //     {
-    //         _dbSet.Update(entity);
-
-    //         return Task.FromResult(TResponseFactory.Ok(entity));
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return Task.FromResult(TResponseFactory.Error<T>(ex.Message));
-    //     }
-    // }
-
-
 }

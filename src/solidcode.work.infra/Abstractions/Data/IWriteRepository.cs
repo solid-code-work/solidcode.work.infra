@@ -5,11 +5,9 @@ namespace solidcode.work.infra.Abstraction;
 
 public interface IWriteRepository<T> where T : class, IEntity
 {
-    Task<TResponse> CreateAsync(T entity);
-    Task<TResponse> UpdateAsync(T entity);
-    // Task<TResponse<T>> CreateAndReturnAsync(T entity);
-    // Task<TResponse<T>> UpdateAndReturnAsync(T entity);
-    Task<TResponse> DeleteAsync(Guid id);
+    Task<TResponse> CreateAsync(T entity, CancellationToken ct = default);
+    Task<TResponse> UpdateAsync(T entity, CancellationToken ct = default);
+    Task<TResponse> DeleteAsync(Guid id, CancellationToken ct = default);
 }
 
 
