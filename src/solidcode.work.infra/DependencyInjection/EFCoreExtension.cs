@@ -6,7 +6,7 @@ using solidcode.work.infra.Configurations;
 using solidcode.work.infra.Persistence;
 using solidcode.work.infra.Repositories;
 
-namespace solidcode.work.infra.EF;
+namespace solidcode.work.infra.DependencyInjection;
 
 public static class EFCoreExtensions
 {

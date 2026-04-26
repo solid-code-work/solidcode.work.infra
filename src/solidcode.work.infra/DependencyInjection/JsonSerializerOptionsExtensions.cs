@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using solidcode.work.infra.Serialization;
 
-namespace solidcode.work.infra;
+namespace solidcode.work.infra.DependencyInjection;
 
-public static class JsonSerializerOptionsExtensions
+public static class JsonSerializerExtensions
 {
     public static void AddSolidCodeDefaults(
         this IServiceCollection services)

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using solidcode.work.infra.Entities;
 
+namespace solidcode.work.infra.DependencyInjection;
+
 public static class QueryablePagingExtensions
 {
     public static async Task<PagedResult<T>> ToPagedResultAsync<T>(

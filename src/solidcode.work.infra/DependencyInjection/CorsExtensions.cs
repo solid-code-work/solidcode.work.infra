@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using solidcode.work.infra.Configurations;
 
-namespace solidcode.work.infra.CORS;
+namespace solidcode.work.infra.DependencyInjection;
 
 public static class SolidCodeCorsExtensions
 {

@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using solidcode.work.infra.Configurations;
 using Polly;
 
-namespace solidcode.work.infra;
+namespace solidcode.work.infra.DependencyInjection;
 
 public static class HttpExtensions
 {

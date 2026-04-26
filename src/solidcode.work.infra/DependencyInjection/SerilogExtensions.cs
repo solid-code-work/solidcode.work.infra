@@ -3,9 +3,9 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
-namespace solidcode.work.infra;
+namespace solidcode.work.infra.DependencyInjection;
 
-public static class LoggingExtensions
+public static class SerilogExtensions
 {
     /// <summary>
     /// Configures Serilog with solid defaults and full configuration support.

@@ -16,7 +16,7 @@ public sealed class MassTransitHelpercs : IMessageProducer
         where TMessage : class
     {
 
-        Console.WriteLine($"📤 Publishing message of type {typeof(TMessage).Name}");
+        Console.WriteLine($"Publishing message of type {typeof(TMessage).Name}");
         return _publishEndpoint.Publish(message, ct);
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace solidcode.work.infra.Security;
+namespace solidcode.work.infra.DependencyInjection;
 
 public static class RateLimiterExtensions
 {

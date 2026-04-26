@@ -8,7 +8,7 @@ using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Configurations;
 using solidcode.work.infra.security;
 
-namespace solidcode.work.infra;
+namespace solidcode.work.infra.DependencyInjection;
 
 public static class AuthenticationExtensions
 {
