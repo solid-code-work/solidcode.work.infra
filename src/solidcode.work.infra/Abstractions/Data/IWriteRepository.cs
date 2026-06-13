@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using solidcode.work.infra.Entities;
+using SolidCode.Work.Infra.Abstractions;
 
 namespace solidcode.work.infra.Abstraction;
 

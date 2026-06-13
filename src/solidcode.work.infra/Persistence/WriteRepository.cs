@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using solidcode.work.infra.Abstraction;
 using solidcode.work.infra.Entities;
+using SolidCode.Work.Infra.Abstractions;
 
 namespace solidcode.work.infra.Repositories;
 
