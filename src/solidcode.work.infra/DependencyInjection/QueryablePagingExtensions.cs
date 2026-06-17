@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using solidcode.work.infra.Entities;
+using Solidcode.Work.Infra.Entities;
 
-namespace solidcode.work.infra.DependencyInjection;
+namespace Solidcode.Work.Infra.DependencyInjection;
 
 public static class QueryablePagingExtensions
 {

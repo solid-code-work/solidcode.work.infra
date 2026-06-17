@@ -1,4 +1,4 @@
-namespace solidcode.work.infra.Abstraction;
+namespace Solidcode.Work.Infra.Abstractions;
 
 public interface ICacheService
 {

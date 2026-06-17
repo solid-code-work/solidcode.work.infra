@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using solidcode.work.infra.Entities;
+using Solidcode.Work.Infra.Entities;
 
-namespace solidcode.work.infra.Controllers;
+namespace Solidcode.Work.Infra.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

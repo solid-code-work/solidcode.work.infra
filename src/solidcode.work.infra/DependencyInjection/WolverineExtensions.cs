@@ -3,11 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Wolverine;
 using Wolverine.EntityFrameworkCore;
 using Wolverine.RabbitMQ;
-using solidcode.work.infra.Configurations;
+using Solidcode.Work.Infra.Configurations;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace solidcode.work.infra.DependencyInjection;
+namespace Solidcode.Work.Infra.DependencyInjection;
 
 // dotnet ef migrations add AddWolverineMessaging
 // dotnet ef database update

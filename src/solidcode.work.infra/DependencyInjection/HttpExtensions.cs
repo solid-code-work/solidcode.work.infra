@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using solidcode.work.infra.Configurations;
+using Solidcode.Work.Infra.Configurations;
 using Polly;
 
-namespace solidcode.work.infra.DependencyInjection;
+namespace Solidcode.Work.Infra.DependencyInjection;
 
 public static class HttpExtensions
 {

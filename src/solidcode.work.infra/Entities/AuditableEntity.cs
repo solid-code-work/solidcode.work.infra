@@ -1,6 +1,6 @@
-using SolidCode.Work.Infra.Abstractions;
+using Solidcode.Work.Infra.Abstractions;
 
-namespace SolidCode.Work.Infra.Entities;
+namespace Solidcode.Work.Infra.Entities;
 
 public abstract class AuditableEntity : IAuditable
 {
@@ -10,7 +10,6 @@ public abstract class AuditableEntity : IAuditable
     public DateTime? UpdatedAt { get; private set; }
     public string? UpdatedBy { get; private set; }
 
-    // Optional: controlled internal setters for infrastructure layer
     public void MarkCreated(string user)
     {
         CreatedAt = DateTime.UtcNow;

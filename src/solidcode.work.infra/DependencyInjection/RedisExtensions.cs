@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using solidcode.work.infra.Abstraction;
-using solidcode.work.infra.Configurations;
+using Solidcode.Work.Infra.Abstractions;
+using Solidcode.Work.Infra.Configurations;
 using StackExchange.Redis;
 
-namespace solidcode.work.infra.DependencyInjection;
+namespace Solidcode.Work.Infra.DependencyInjection;
 
 public static class RedisExtensions
 {

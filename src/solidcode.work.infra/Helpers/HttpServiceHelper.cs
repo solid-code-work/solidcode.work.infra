@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
-using solidcode.work.infra.Entities;
+using Solidcode.Work.Infra.Entities;
 
-namespace solidcode.work.infra;
+namespace Solidcode.Work.Infra;
 
 public class HttpServiceHelper
 {

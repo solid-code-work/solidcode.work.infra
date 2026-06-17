@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
-namespace solidcode.work.infra;
+namespace Solidcode.Work.Infra;
 
 public static class SwaggerExtensions
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-namespace solidcode.work.infra.Entities;
+namespace Solidcode.Work.Infra.Entities;
 
 public class TResponse
 {

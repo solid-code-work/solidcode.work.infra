@@ -1,6 +1,6 @@
 using MassTransit.Configuration;
 
-namespace solidcode.work.infra.Entities;
+namespace Solidcode.Work.Infra.Abstractions;
 
 public interface IListEditEntity
 {

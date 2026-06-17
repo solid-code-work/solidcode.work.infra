@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using solidcode.work.infra.Entities;
-using SolidCode.Work.Infra.Abstractions;
+using Solidcode.Work.Infra.Entities;
 
+namespace Solidcode.Work.Infra.Abstractions;
 
 public interface IReadRepository<T> where T : class, IEntity
 {

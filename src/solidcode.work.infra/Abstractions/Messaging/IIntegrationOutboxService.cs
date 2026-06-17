@@ -1,6 +1,6 @@
-using solidcode.work.infra.Entities;
+using Solidcode.Work.Infra.Entities;
 
-namespace solidcode.work.infra.Abstraction;
+namespace Solidcode.Work.Infra.Abstractions;
 
 public interface IIntegrationOutboxService<TOutbox>
     where TOutbox : IIntegrationOutbox

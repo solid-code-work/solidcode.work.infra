@@ -1,4 +1,4 @@
-namespace SolidCode.Work.Infra.Abstractions;
+namespace Solidcode.Work.Infra.Abstractions;
 
 public interface IEntity
 {

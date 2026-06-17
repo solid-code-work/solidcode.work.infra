@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace solidcode.work.infra.Serialization;
+namespace Solidcode.Work.Infra.Serialization;
 
 public class DateOnlyJsonConverter : JsonConverter<DateOnly>
 {

@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
-using solidcode.work.infra.Abstraction;
+using Solidcode.Work.Infra.Abstractions;
 
-namespace solidcode.work.infra.security;
+namespace Solidcode.Work.Infra.security;
 
 public sealed class PasswordHashService : IPasswordHashService
 {

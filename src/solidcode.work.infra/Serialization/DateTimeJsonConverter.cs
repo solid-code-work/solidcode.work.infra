@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using System.Globalization;
 using System.Text.Json;
-namespace solidcode.work.infra.Serialization;
+namespace Solidcode.Work.Infra.Serialization;
 
 public sealed class DateTimeJsonConverter : JsonConverter<DateTime>
 {

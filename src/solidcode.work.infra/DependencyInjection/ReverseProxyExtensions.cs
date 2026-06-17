@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace solidcode.work.infra;
+namespace Solidcode.Work.Infra;
 
 public static class ReverseProxyExtensions
 {

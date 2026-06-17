@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using solidcode.work.infra.Abstraction;
-using solidcode.work.infra.Configurations;
-using solidcode.work.infra.security;
+using Solidcode.Work.Infra.Abstractions;
+using Solidcode.Work.Infra.Configurations;
+using Solidcode.Work.Infra.security;
+using Solidcode.Work.Infra.Services;
 
-namespace solidcode.work.infra.DependencyInjection;
+namespace Solidcode.Work.Infra.DependencyInjection;
 
 public static class AuthenticationExtensions
 {

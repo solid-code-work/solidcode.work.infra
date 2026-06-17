@@ -1,4 +1,4 @@
-namespace solidcode.work.infra.Events;
+namespace Solidcode.Work.Infra.Events;
 
 public enum IntegrationEventType
 {

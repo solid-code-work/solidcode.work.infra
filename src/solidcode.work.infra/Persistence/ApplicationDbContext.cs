@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using solidcode.work.infra.Abstraction;
-using solidcode.work.infra.Entities;
+using Solidcode.Work.Infra.Abstractions;
+using Solidcode.Work.Infra.Entities;
 
-namespace solidcode.work.infra.Persistence;
+namespace Solidcode.Work.Infra.Persistence;
 
 public class ApplicationDbContext : IApplicationDbContext
 {

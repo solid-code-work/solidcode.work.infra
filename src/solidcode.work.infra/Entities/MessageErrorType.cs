@@ -1,4 +1,4 @@
-﻿namespace solidcode.work.infra.Entities;
+﻿namespace Solidcode.Work.Infra.Entities;
 
 public enum MessageErrorType
 {

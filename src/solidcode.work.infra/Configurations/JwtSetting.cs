@@ -1,6 +1,6 @@
 using Microsoft.IdentityModel.Tokens;
 
-namespace solidcode.work.infra.Configurations;
+namespace Solidcode.Work.Infra.Configurations;
 
 public sealed class JwtSetting
 {

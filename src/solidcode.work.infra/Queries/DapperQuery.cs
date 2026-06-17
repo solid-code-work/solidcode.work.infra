@@ -1,7 +1,7 @@
 using System.Data;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
-using solidcode.work.infra.Abstraction;
+using Solidcode.Work.Infra.Abstractions;
 
 public class DapperQuery
 {

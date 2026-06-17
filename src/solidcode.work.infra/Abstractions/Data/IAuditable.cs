@@ -1,4 +1,4 @@
-namespace SolidCode.Work.Infra.Abstractions;
+namespace Solidcode.Work.Infra.Abstractions;
 
 public interface IAuditable
 {
@@ -7,4 +7,7 @@ public interface IAuditable
 
     DateTime? UpdatedAt { get; }
     string? UpdatedBy { get; }
+
+    void MarkCreated(string user);
+    void MarkUpdated(string user);
 }

@@ -1,8 +1,7 @@
-using System.Linq.Expressions;
-using solidcode.work.infra.Entities;
-using SolidCode.Work.Infra.Abstractions;
+using Solidcode.Work.Infra.Entities;
+using Solidcode.Work.Infra.Abstractions;
 
-namespace solidcode.work.infra.Abstraction;
+namespace Solidcode.Work.Infra.Abstractions;
 
 public interface IWriteRepository<T> where T : class, IEntity
 {

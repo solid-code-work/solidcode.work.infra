@@ -3,8 +3,9 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using solidcode.work.infra.Configurations;
+using Solidcode.Work.Infra.Configurations;
 
+namespace Solidcode.Work.Infra.Services;
 
 public sealed class JwtTokenService : IJwtTokenService
 {

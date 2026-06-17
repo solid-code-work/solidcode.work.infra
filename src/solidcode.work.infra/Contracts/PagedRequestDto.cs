@@ -1,4 +1,5 @@
-namespace solidcode.work.infra.Abstraction;
+namespace Solidcode.Work.Infra.Abstractions;
+
 public abstract class PagedRequestDto
 {
     public int PageNumber { get; set; } = 1;

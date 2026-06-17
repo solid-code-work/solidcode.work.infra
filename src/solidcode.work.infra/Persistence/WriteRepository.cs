@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using solidcode.work.infra.Abstraction;
-using solidcode.work.infra.Entities;
-using SolidCode.Work.Infra.Abstractions;
+using Solidcode.Work.Infra.Abstractions;
+using Solidcode.Work.Infra.Entities;
 
-namespace solidcode.work.infra.Repositories;
+namespace Solidcode.Work.Infra.Repositories;
 
 public class WriteRepository<T> : IWriteRepository<T>
 where T : class, IEntity

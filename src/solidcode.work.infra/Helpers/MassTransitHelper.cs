@@ -1,7 +1,7 @@
 using MassTransit;
-using solidcode.work.infra.Abstraction;
+using Solidcode.Work.Infra.Abstractions;
 
-namespace solidcode.work.infra;
+namespace Solidcode.Work.Infra;
 
 public sealed class MassTransitHelpercs : IMessageProducer
 {

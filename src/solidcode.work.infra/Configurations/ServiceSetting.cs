@@ -1,4 +1,4 @@
-namespace solidcode.work.infra.Configurations;
+namespace Solidcode.Work.Infra.Configurations;
 
 public class ServiceSetting
 {

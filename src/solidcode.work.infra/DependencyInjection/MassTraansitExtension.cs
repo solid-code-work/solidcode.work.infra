@@ -2,10 +2,10 @@ using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using solidcode.work.infra.Abstraction;
-using solidcode.work.infra.Configurations;
+using Solidcode.Work.Infra.Abstractions;
+using Solidcode.Work.Infra.Configurations;
 
-namespace solidcode.work.infra.DependencyInjection;
+namespace Solidcode.Work.Infra.DependencyInjection;
 
 public static class MassTraansitExtension
 {

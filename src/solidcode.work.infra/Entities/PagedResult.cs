@@ -1,6 +1,6 @@
 using System;
 
-namespace solidcode.work.infra.Entities;
+namespace Solidcode.Work.Infra.Entities;
 
 public sealed class PagedResult<T>
 {
